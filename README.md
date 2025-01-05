@@ -2,18 +2,6 @@ TODO: -skipIMP and -skipSYN args will not create the output_products folder, nee
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
-# DFX
-- This version is automated. Verified on U96 with three RPs and three RMs each.
-- RMs must be in folders named RM* in hdl directory.
-- Each RM must have same module name.
-- RM folders are parsed to get module names.
-- RP instance in static region MUST be named "\<RM module name>_inst"
-  - Ex. RM0 = "led_cnt_pr", instance in io_top must be "led_cnt_pr_inst".
-- Currently, only one full config is built. This will be the 'first' RM for each RP which are sorted ASCII.
-  - Empty static is not built, there is an option to enable this in 'imp.tcl'.
-  - All partial bitstreams are generated.
-- No VHDL. Verilog and systemverilog only.
-
 ## script to build : BUILD.tcl
 > tclsh BUILD.tcl
 
@@ -81,3 +69,17 @@ TODO: -skipIMP and -skipSYN args will not create the output_products folder, nee
 
 #### Build with BD project PRJ0 already generated, clean and regenerate all IP in ip folder
 > tclsh BUILD.tcl -name PRJ0 -skipBD -clean -cleanIP
+
+
+
+# DFX
+- This version is automated. Verified on U96 with three RPs and three RMs each.
+- RMs must be in folders named RM* in hdl directory.
+- Each RM must have same module name.
+- RM folders are parsed to get module names.
+- RP instance in static region MUST be named "\<RM module name>_inst"
+  - Ex. RM0 = "led_cnt_pr", instance in io_top must be "led_cnt_pr_inst".
+- Currently, only one full config is built. This will be the 'first' RM for each RP which are sorted ASCII.
+  - Empty static is not built, there is an option to enable this in 'imp.tcl'.
+  - All partial bitstreams are generated.
+- No VHDL. Verilog and systemverilog only.
