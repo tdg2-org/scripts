@@ -1,9 +1,7 @@
-TODO: 
-  -skipIMP and -skipSYN args will not create the output_products folder, need to check if exists first, create only if NOT exist
-      
-  Many updates not verified with DFX build, need to test.
-      
-  helpMsg needs update.
+### TODO: 
+- -skipIMP and -skipSYN args will not create the output_products folder, need to check if exists first, create only if NOT exist
+- Many updates not verified with DFX build, need to test.
+- helpMsg needs update.
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
