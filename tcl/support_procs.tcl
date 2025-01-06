@@ -28,7 +28,16 @@ proc getProjName {} {
   upvar argv argv
   upvar argc argc
   set defaultProjName "DEFAULT_PROJECT"
-  if {"-name" in $argv} {
+  if {"-cfg" in $argv} {
+    set projNameIdx [lsearch $argv "-cfg"]
+    set projNameIdx [expr $projNameIdx + 1]
+    if {$projNameIdx == $argc} {
+      set projName $defaultProjName
+    } else {
+      set projName [lindex $argv $projNameIdx]
+      set projName "PRJ_$projName"
+    }
+  } elseif {"-name" in $argv} {
     set projNameIdx [lsearch $argv "-name"]
     set projNameIdx [expr $projNameIdx + 1]
     if {$projNameIdx == $argc} {
@@ -49,7 +58,16 @@ proc getBDtclName {} {
   upvar argv argv
   upvar argc argc
   set defaultBDtclName "top_bd"
-  if {"-BDtcl" in $argv} {
+  if {"-cfg" in $argv} {
+    set BDtclNameIdx [lsearch $argv "-cfg"]
+    set BDtclNameIdx [expr $BDtclNameIdx + 1]
+    if {$BDtclNameIdx == $argc} {
+      set BDtclName $defaultBDtclName
+    } else {
+      set BDtclName [lindex $argv $BDtclNameIdx]
+      set BDtclName "top_bd_$BDtclName"
+    }
+  } elseif {"-BDtcl" in $argv} {
     set BDtclNameIdx [lsearch $argv "-BDtcl"]
     set BDtclNameIdx [expr $BDtclNameIdx + 1]
     if {$BDtclNameIdx == $argc} {
@@ -91,7 +109,16 @@ proc getOutputDir {} {
   upvar argv argv
   upvar argc argc
   set defaultOutputDir "../output_products"
-  if {"-out" in $argv} {
+  if {"-cfg" in $argv} {
+    set outDirIdx [lsearch $argv "-cfg"]
+    set outDirIdx [expr $outDirIdx + 1]
+    if {$outDirIdx == $argc} {
+      set outDirName $defaultOutputDir
+    } else {
+      set outDirName [lindex $argv $outDirIdx]
+      set outDirName "output_products_$outDirName"
+    }
+  } elseif {"-out" in $argv} {
     set outDirIdx [lsearch $argv "-out"]
     set outDirIdx [expr $outDirIdx + 1]
     if {$outDirIdx == $argc} {
@@ -102,7 +129,7 @@ proc getOutputDir {} {
   } else {
     set outDirName $defaultOutputDir
   }
-  return $outDirName
+  return "../$outDirName"
 }
 
 #--------------------------------------------------------------------------------------------------
@@ -112,15 +139,23 @@ proc buildTimeEnd {} {
   upvar startTime startTime
   upvar buildTimeStamp buildTimeStamp
   upvar ghash_msb ghash_msb
-  
+  upvar outputDir outputDir
+  upvar projName projName
+  upvar topBDtcl topBDtcl
+  upvar topBD topBD
+
   set endTime     [clock seconds]
   set buildTime   [expr $endTime - $startTime]
   set buildMin    [expr $buildTime / 60]
   set buildSecRem [expr $buildTime % 60]
   
   puts "\n------------------------------------------"
-  puts "** BUILD COMPLETE ** $buildTimeStamp\_$ghash_msb"
-  puts "Timestamp: $buildTimeStamp"
+  puts "** BUILD COMPLETE ** $buildTimeStamp\_$ghash_msb\n"
+  puts "Output products directory : $outputDir"
+  puts "BD project name           : $projName"
+  puts "BD project tcl script     : $topBDtcl.tcl"
+  puts "BD name                   : $topBD"
+  puts "\nTimestamp: $buildTimeStamp"
   puts "Git Hash: $ghash_msb"
   puts "\nBuild Time: $buildMin min:$buildSecRem sec"
   puts "------------------------------------------"

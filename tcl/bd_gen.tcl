@@ -46,8 +46,10 @@ make_wrapper -files [get_files $bdFile] -top
 read_verilog $wrapperFile
 set_property synth_checkpoint_mode None [get_files $bdFile]
 generate_target all [get_files $bdFile]
+
 # for HLS module
 #compile_c [get_ips -all *v_tpg*]
+foreach ip_in_proj [get_ips] {compile_c [get_ips $ip_in_proj]}
 
 set_property top [file rootname [file tail $wrapperFile]] [current_fileset]  
 
