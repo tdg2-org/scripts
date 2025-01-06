@@ -15,7 +15,7 @@ set hdlDir    [lindex $argv 0]
 set partNum   [lindex $argv 1]
 set topBD     [lindex $argv 2]
 set topEntity [lindex $argv 3]
-set dcpDir    [lindex $argv 4]
+set imageDir  [lindex $argv 4]
 set xdcDir    [lindex $argv 5]
 set projName  [lindex $argv 6]
 set RPs       [lindex $argv 7]
@@ -80,5 +80,5 @@ read_verilog $wrapperFile
 
 synth_design -top $topEntity -part $partNum
 if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
-write_checkpoint -force $dcpDir/top_synth.dcp
+write_checkpoint -force $imageDir/dcp/top_synth.dcp
 

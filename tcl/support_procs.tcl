@@ -85,6 +85,27 @@ proc getBDName {} {
 }
 
 #--------------------------------------------------------------------------------------------------
+# output products/image directory follows after '-out' input arg. default if not provided
+#--------------------------------------------------------------------------------------------------
+proc getOutputDir {} {
+  upvar argv argv
+  upvar argc argc
+  set defaultOutputDir "../output_products"
+  if {"-out" in $argv} {
+    set outDirIdx [lsearch $argv "-out"]
+    set outDirIdx [expr $outDirIdx + 1]
+    if {$outDirIdx == $argc} {
+      set outDirName $defaultOutputDir
+    } else {
+      set outDirName [lindex $argv $outDirIdx]
+    }
+  } else {
+    set outDirName $defaultOutputDir
+  }
+  return $outDirName
+}
+
+#--------------------------------------------------------------------------------------------------
 # 
 #--------------------------------------------------------------------------------------------------
 proc buildTimeEnd {} {

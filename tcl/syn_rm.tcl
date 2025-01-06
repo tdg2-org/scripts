@@ -25,7 +25,7 @@ for {set idx 0} {$idx <$RPlen} {incr idx} {
   foreach x $curRMs {
     read_verilog $hdlDir/$curRPdir/$x
     synth_design -mode out_of_context -top $curRPmod -part $partNum
-    write_checkpoint -force $rmDir/$curRPdir/$curRPdir\_post_synth_[file rootname $x].dcp
+    write_checkpoint -force $rmDir/dcp/$curRPdir/$curRPdir\_post_synth_[file rootname $x].dcp
   }
 }
 
