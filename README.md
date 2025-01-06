@@ -1,4 +1,5 @@
 TODO: -skipIMP and -skipSYN args will not create the output_products folder, need to check if exists first, create only if NOT exist
+      Many updates not verified with DFX build, need to test.
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
@@ -44,6 +45,9 @@ TODO: -skipIMP and -skipSYN args will not create the output_products folder, nee
 -BDName     : name of BD within tcl script. "-BDname \<bd-name>". Default is "top_bd" if not provided.
 
 -verbose    : print script tcl for debug. prevent usage of -notrace for vivado commands.
+
+-out        : "-out \<output_products-directory-name>". Custom name of directory location for image,
+              dcp's, logs, etc. Default is "output_products" if not provided.
 
 ## Examples / Quick copies
 #### Build full design generating new BD project with name PRJ2, and generate IP in the ip folder. This would also build DFX partials if there were any present.
