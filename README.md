@@ -85,7 +85,7 @@
 > tclsh BUILD.tcl -clean -out out_1080p_VTPG -BDtcl top_bd_1080p_VTPG -name PRJ_1080p_VTPG -noIP
 
 #### With an existing BD tcl script named "top_bd_myBD1.tcl", generate BD project called "PRJ_myBD1", image and output products generated in "output_products_myBD1"
-> tclsh BUILD.tcl -clean -cfg myBD1
+> tclsh BUILD.tcl -clean -cfg myBD1 \n
 > tclsh BUILD.tcl -clean -noIP -cfg custPL_TPG720
 
 # DFX
