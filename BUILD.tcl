@@ -50,7 +50,6 @@ set startTime [clock seconds]
 set buildTimeStamp [getTimeStamp $startTime]
 puts "\n*** BUILD TIMESTAMP: $buildTimeStamp ***\n"
 puts "TCL Version : $tcl_version"
-helpMsg 
 set ghash_msb [getGitHash]
 
 if {("-proj" in $argv)} {set bdProjOnly TRUE} else {set bdProjOnly FALSE}
