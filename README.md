@@ -90,6 +90,9 @@
 > tclsh BUILD.tcl -clean -noIP -cfg custPL_TPG720  
 > tclsh BUILD.tcl -clean -noIP -cfg custPL_TPG1080  
 > tclsh BUILD.tcl -clean -noIP -name PRJ_custPL_TPG1080 -out output_products_custPL_TPG1080 -BDtcl top_bd_custPL_TPG1080 -skipBD  
+> tclsh BUILD.tcl -clean -noIP -name PRJ_custPL_TPG1080 -out out_custPL_TPG1080_addH2 -skipBD  
+> tclsh BUILD.tcl -clean -cfg custPL_TPG1080_addsub  
+> tclsh BUILD.tcl -clean -name PRJ_custPL_TPG1080_addsub -out output_products_custPL_TPG1080_addsub -skipBD -skipIP  
 
 
 # DFX
