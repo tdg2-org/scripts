@@ -108,7 +108,7 @@ proc getBDName {} {
 proc getOutputDir {} {
   upvar argv argv
   upvar argc argc
-  set defaultOutputDir "../output_products"
+  set defaultOutputDir "output_products"
   if {"-cfg" in $argv} {
     set outDirIdx [lsearch $argv "-cfg"]
     set outDirIdx [expr $outDirIdx + 1]
