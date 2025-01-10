@@ -6,4 +6,8 @@
 vivado*
 
 hd_visual
+transcript
 
+# HLS generated
+prj
+runhls*
