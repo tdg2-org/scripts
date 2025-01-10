@@ -1,4 +1,7 @@
-TODO: -skipIMP and -skipSYN args will not create the output_products folder, need to check if exists first, create only if NOT exist
+### TODO: 
+- -skipIMP and -skipSYN args will not create the output_products folder, need to check if exists first, create only if NOT exist
+- Many updates not verified with DFX build, need to test.
+- helpMsg needs update.
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
@@ -45,6 +48,14 @@ TODO: -skipIMP and -skipSYN args will not create the output_products folder, nee
 
 -verbose    : print script tcl for debug. prevent usage of -notrace for vivado commands.
 
+-out        : "-out \<output_products-directory-name>". Custom name of directory location for image,
+              dcp's, logs, etc. Default is "output_products" if not provided.
+
+-cfg        : "-cfg \<cfg-name>". configuration that combines -name, -BDtcl, -out. requires an 
+              existing BD tcl script named "top_bd_\<cfg-name>". BD project will be generated
+              with name "PRJ_\<cfg-name>". output_products/image folder will be "output_products_\<cfg-name>".
+
+
 ## Examples / Quick copies
 #### Build full design generating new BD project with name PRJ2, and generate IP in the ip folder. This would also build DFX partials if there were any present.
 > tclsh BUILD.tcl -clean -name PRJ2
@@ -70,6 +81,18 @@ TODO: -skipIMP and -skipSYN args will not create the output_products folder, nee
 #### Build with BD project PRJ0 already generated, clean and regenerate all IP in ip folder
 > tclsh BUILD.tcl -name PRJ0 -skipBD -clean -cleanIP
 
+#### Output products/image in folder "out_1080p_VTPG", name of BD tcl file is "top_bd_1080p_VTPG.tcl", generated BD project "PRJ_1080p_VTPG", no IP external to BD.
+> tclsh BUILD.tcl -clean -out out_1080p_VTPG -BDtcl top_bd_1080p_VTPG -name PRJ_1080p_VTPG -noIP
+
+#### With an existing BD tcl script named "top_bd_myBD1.tcl", generate BD project called "PRJ_myBD1", image and output products generated in "output_products_myBD1"
+> tclsh BUILD.tcl -clean -cfg myBD1  
+
+> tclsh BUILD.tcl -clean -noIP -cfg custPL_TPG720  
+> tclsh BUILD.tcl -clean -noIP -cfg custPL_TPG1080  
+> tclsh BUILD.tcl -clean -noIP -name PRJ_custPL_TPG1080 -out output_products_custPL_TPG1080 -BDtcl top_bd_custPL_TPG1080 -skipBD  
+> tclsh BUILD.tcl -clean -noIP -name PRJ_custPL_TPG1080 -out out_custPL_TPG1080_addH2 -skipBD  
+> tclsh BUILD.tcl -clean -cfg custPL_TPG1080_addsub  
+> tclsh BUILD.tcl -clean -name PRJ_custPL_TPG1080_addsub -out output_products_custPL_TPG1080_addsub -skipBD -skipIP  
 
 
 # DFX

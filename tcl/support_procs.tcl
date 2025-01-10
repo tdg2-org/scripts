@@ -28,7 +28,16 @@ proc getProjName {} {
   upvar argv argv
   upvar argc argc
   set defaultProjName "DEFAULT_PROJECT"
-  if {"-name" in $argv} {
+  if {"-cfg" in $argv} {
+    set projNameIdx [lsearch $argv "-cfg"]
+    set projNameIdx [expr $projNameIdx + 1]
+    if {$projNameIdx == $argc} {
+      set projName $defaultProjName
+    } else {
+      set projName [lindex $argv $projNameIdx]
+      set projName "PRJ_$projName"
+    }
+  } elseif {"-name" in $argv} {
     set projNameIdx [lsearch $argv "-name"]
     set projNameIdx [expr $projNameIdx + 1]
     if {$projNameIdx == $argc} {
@@ -49,7 +58,16 @@ proc getBDtclName {} {
   upvar argv argv
   upvar argc argc
   set defaultBDtclName "top_bd"
-  if {"-BDtcl" in $argv} {
+  if {"-cfg" in $argv} {
+    set BDtclNameIdx [lsearch $argv "-cfg"]
+    set BDtclNameIdx [expr $BDtclNameIdx + 1]
+    if {$BDtclNameIdx == $argc} {
+      set BDtclName $defaultBDtclName
+    } else {
+      set BDtclName [lindex $argv $BDtclNameIdx]
+      set BDtclName "top_bd_$BDtclName"
+    }
+  } elseif {"-BDtcl" in $argv} {
     set BDtclNameIdx [lsearch $argv "-BDtcl"]
     set BDtclNameIdx [expr $BDtclNameIdx + 1]
     if {$BDtclNameIdx == $argc} {
@@ -85,21 +103,59 @@ proc getBDName {} {
 }
 
 #--------------------------------------------------------------------------------------------------
+# output products/image directory follows after '-out' input arg. default if not provided
+#--------------------------------------------------------------------------------------------------
+proc getOutputDir {} {
+  upvar argv argv
+  upvar argc argc
+  set defaultOutputDir "output_products"
+  if {"-cfg" in $argv} {
+    set outDirIdx [lsearch $argv "-cfg"]
+    set outDirIdx [expr $outDirIdx + 1]
+    if {$outDirIdx == $argc} {
+      set outDirName $defaultOutputDir
+    } else {
+      set outDirName [lindex $argv $outDirIdx]
+      set outDirName "output_products_$outDirName"
+    }
+  } elseif {"-out" in $argv} {
+    set outDirIdx [lsearch $argv "-out"]
+    set outDirIdx [expr $outDirIdx + 1]
+    if {$outDirIdx == $argc} {
+      set outDirName $defaultOutputDir
+    } else {
+      set outDirName [lindex $argv $outDirIdx]
+    }
+  } else {
+    set outDirName $defaultOutputDir
+  }
+  return "../$outDirName"
+}
+
+#--------------------------------------------------------------------------------------------------
 # 
 #--------------------------------------------------------------------------------------------------
 proc buildTimeEnd {} {
   upvar startTime startTime
   upvar buildTimeStamp buildTimeStamp
   upvar ghash_msb ghash_msb
-  
+  upvar outputDir outputDir
+  upvar projName projName
+  upvar topBDtcl topBDtcl
+  upvar topBD topBD
+
   set endTime     [clock seconds]
   set buildTime   [expr $endTime - $startTime]
   set buildMin    [expr $buildTime / 60]
   set buildSecRem [expr $buildTime % 60]
   
   puts "\n------------------------------------------"
-  puts "** BUILD COMPLETE ** $buildTimeStamp\_$ghash_msb"
-  puts "Timestamp: $buildTimeStamp"
+  puts "** BUILD COMPLETE ** $buildTimeStamp\_$ghash_msb\n"
+  puts "Output products directory : $outputDir"
+  puts "BD project name           : $projName"
+  puts "BD project tcl script     : $topBDtcl.tcl"
+  puts "BD name                   : $topBD"
+  puts "\nTimestamp: $buildTimeStamp"
   puts "Git Hash: $ghash_msb"
   puts "\nBuild Time: $buildMin min:$buildSecRem sec"
   puts "------------------------------------------"
@@ -135,25 +191,6 @@ proc getGitHash {} {
     set ghash_msb [string range $git_hash 0 7]
   }
   return [string toupper $ghash_msb]
-}
-
-#--------------------------------------------------------------------------------------------------
-# needs update or just remove, meh
-#--------------------------------------------------------------------------------------------------
-proc helpMsg {} {
-    upvar argv argv
-  if {("-h" in $argv) ||("-help" in $argv)} {
-    puts "OUT DATED OUT DATED OUT DATED INACCURATE"
-    puts "\t-proj : Generate project only."
-    puts "\t-name <PROJECT_NAME> : Name of project (used with -proj). Default name used if not specified."
-    puts "\t-clean : Clean build generated files and logs from scripts directory."
-    puts "\t-verbose : Prints all tcl commands during build time."
-    puts "\t-no_bd : For debug, create project with everything except adding block design or block design containers, to be added manually."
-    puts "\t-bd <BD TCL Script Name : Name of BD tcl script, default 'top_bd' if not specified. ** FOR DEBUG ONLY ** Top level BD must remain \n\
-          \t  'top_bd', this is only designed for tcl scripts with names differing from 'top_bd.tcl'"
-    puts "\t-h, -help : Help."
-  exit
-  }
 }
 
 #--------------------------------------------------------------------------------------------------

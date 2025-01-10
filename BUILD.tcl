@@ -26,12 +26,11 @@ set hdlDir      "../hdl"
 set simDir      "../hdl/tb"
 set ipDir       "../ip"
 set xdcDir      "../xdc"
-set outputDir   "../output_products"
-set dcpDir      "$outputDir/dcp"
 set bdDir       "../bd"
 set topBD       [getBDName]     ;# default = "top_bd"
 set topBDtcl    [getBDtclName]  ;# default = "top_bd" for top_bd.tcl
 set projName    [getProjName]
+set outputDir   [getOutputDir]
 #--------------------------------------------------------------------------------------------------
 # DFX vars. These are auto-populated. DO NOT MODIFY.
 #--------------------------------------------------------------------------------------------------
@@ -51,7 +50,6 @@ set startTime [clock seconds]
 set buildTimeStamp [getTimeStamp $startTime]
 puts "\n*** BUILD TIMESTAMP: $buildTimeStamp ***\n"
 puts "TCL Version : $tcl_version"
-helpMsg 
 set ghash_msb [getGitHash]
 
 if {("-proj" in $argv)} {set bdProjOnly TRUE} else {set bdProjOnly FALSE}
@@ -60,7 +58,7 @@ if {("-sim" in $argv)} {set simProj TRUE} else {set simProj FALSE}
 if {!$bdProjOnly && !$simProj} { ;# BD project or sim only, skip all this
   if {("-forceCleanImg" in $argv)} {
     set imageFolder [outputDirGen]
-  } elseif {("-noCleanImg" in $argv) || ("-skipSYN" in $argv) || ("-skipIMP" in $argv) || ("-skipRM" in $argv)} {
+  } elseif {("-noCleanImg" in $argv) || ("-skipSYN" in $argv) || ("-skipIMP" in $argv) || ("-skipRM" in $argv) || ("-out" in $argv)} {
     puts "\n** Skipping clean output_products. **"
   } else {
     set imageFolder [outputDirGen]
@@ -87,17 +85,17 @@ if {!("-skipIP" in $argv) && !$noIP && !$bdProjOnly && !$simProj} {
 # Synthesize RMs OOC
 if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj} {
   preSynthRMcheck ;# mostly just pre verification of RPs/RMs from getDFXconfigs. If this doesn't fail, safe to synth RMs.
-  vivadoCmd "syn_rm.tcl" $hdlDir $partNum \"$RMs\" $dcpDir \"$RPs\" $RPlen
+  vivadoCmd "syn_rm.tcl" $hdlDir $partNum \"$RMs\" $outputDir \"$RPs\" $RPlen
 }
 
 # Synthesize full design (static if DFX)
 if {!("-skipSYN" in $argv) && !$bdProjOnly && !$simProj} {
-  vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $dcpDir $xdcDir $projName \"$RPs\" $noIP
+  vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" $noIP
 }
 
 # P&R + bitsream(s)
 if {!("-skipIMP" in $argv) && !$bdProjOnly && !$simProj} {
-  vivadoCmd "imp.tcl" \"$RMs\" $dcpDir \"$RPs\" $RPlen $outputDir $buildTimeStamp $MaxRMs
+  vivadoCmd "imp.tcl" \"$RMs\" $outputDir \"$RPs\" $RPlen $buildTimeStamp $MaxRMs
 }
 
 # simulation project

@@ -3,6 +3,10 @@
 #   however, the syn.tcl script is looking at the saved project, not the in-memory files.
 #   need to arrange this and syn.tcl to run full in-memory...
 #   if -name is provided: use saved proj, otherwise in-memory only
+# - Need to add all xci IP files from the 'ip' folder. This is non-BD IP, however some
+# of these may be used in common modules that have wrappers for use in BD, which will
+# cause a failure in the BD project if missing. Also, it doesn't hurt just to add them
+# to the BD project even if unused. 
 
 # generate block design with associated dependencies
 # UG994, UG892
@@ -33,6 +37,8 @@ readVerilog $hdlDir/bd
 readVerilog $hdlDir/common 
 source $bdDir/$topBDtcl.tcl
 
+# add XCI files here from IP folder
+
 #--------------------------------------------------------------------------------------------------
 # TODO: have option to to full in-memory build. Also build with already generated BD project:
 # in-memory : ".srcs/..."
@@ -46,8 +52,10 @@ make_wrapper -files [get_files $bdFile] -top
 read_verilog $wrapperFile
 set_property synth_checkpoint_mode None [get_files $bdFile]
 generate_target all [get_files $bdFile]
+
 # for HLS module
 #compile_c [get_ips -all *v_tpg*]
+foreach ip_in_proj [get_ips] {compile_c [get_ips $ip_in_proj]}
 
 set_property top [file rootname [file tail $wrapperFile]] [current_fileset]  
 
