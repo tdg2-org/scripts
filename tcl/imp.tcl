@@ -61,7 +61,7 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
     set githash_cells_path [get_cells -hierarchical *user_init_64b_inst*]                  
     source ./tcl/load_git_hash.tcl                                                             
     set_property BITSTREAM.CONFIG.USR_ACCESS $buildTime [current_design]                   
-    write_checkpoint -force $outputDir/dcp/$cfgName.dcp
+    write_checkpoint -force $outputDir/dcp/$cfgName\_ROUTED.dcp
     if {![file exists $outputDir/bit]} {file mkdir $outputDir/bit} ;# write_bitstream won't create folder even with -force
     write_bitstream -force -no_partial_bitfile $outputDir/bit/$cfgName.bit
   }
