@@ -60,3 +60,40 @@ read_checkpoint -cell led_cnt3_pr_inst RM2_post_synth_led_cnt3_HH.dcp
   route_design
 
   write_bitstream -force -cell led_cnt3_pr_inst led_cnt3_HH.bit
+
+#------------------------------------------------------------------------------
+# New RM or modified RM only, in full BUILD (full design already run once for static region)
+
+tclsh BUILD.tcl -RP led_cnt3_pr -RM led_cnt3_HH.sv RM2  ;# -RP <moduleName> -RM <filename> <RPdir>
+# this will be partial RP/RM command
+# add error checking: -RP / -RM must coincide
+#                     each must be compatible with each other
+#                     check for full static DCP
+
+# first synth the new/modified module
+# syn_rm.tcl, dont loop, just the one module
+
+# RPonly = led_cnt3_pr      argv
+# RMonly = led_cnt3_HH.sv   argv
+# RPdir  = RM2  ** need to get this automatically somehow from populated RPs/RMs
+if {$RPonly != ""} {
+  read_verilog $hdlDir/$RPdir/$RMonly
+  synth_design -mode out_of_context -top $RPonly -part $partNum
+  write_checkpoint -force $rmDir/dcp/$RPdir/$RPdir\_post_synth_[file rootname $RMonly].dcp
+}
+
+# skip synth
+# imp.tcl
+# open abs shell only
+#open_checkpoint led_cnt3_pr_AbSh.dcp
+open_checkpoint $RPonly\_AbSh.dcp
+#read_checkpoint -cell led_cnt3_pr_inst RM2_post_synth_led_cnt3_HH.dcp
+read_checkpoint -cell $RPonly\_inst $outputDir/dcp/$RPdir\_post_synth_[file rootname $RMonly].dcp
+  
+  opt_design
+  place_design
+  phys_opt_design
+  route_design
+
+  #write_bitstream -force -cell led_cnt3_pr_inst led_cnt3_HH.bit
+  write_bitstream -force -cell $RPonly\_inst $outputDir/bit/$RPdir/$RPdir\_[file rootname $RMonly]_partial.bit

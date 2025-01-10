@@ -1,5 +1,14 @@
 # Synth RMs OOC, for DFX only.
 
+# Reconfigurable partitions are in the top/full design. Instance name in the full static region.
+# Format for $RPs:  RM0 <RP0_module_name> RM1 <RP1_module_name> ... etc.
+#                   RM0 led_cnt_pr RM1 led_cnt2_pr RM2 led_cnt3_pr RM4 axil_reg32_2
+#
+# Reconfigurable module is any module that coincides with a specific RP.
+# Format for $RMs:  RM0 {RM0_A.sv RM0_B.sv RM0_C.sv} RM1 {RM1_A.sv RM1_B.sv} ... etc.
+#                   RM0 {led_cnt_A.sv led_cnt_B.sv led_cnt_C.sv} RM1 {led_cnt2_A.sv led_cnt2_B.sv led_cnt2_C.sv} RM2 {led_cnt3_A.sv led_cnt3_HH.sv} RM4 {axil_reg32_A.v axil_reg32_B.v}
+
+
 set hdlDir      [lindex $argv 0]
 set partNum     [lindex $argv 1]
 set RMs         [lindex $argv 2]
