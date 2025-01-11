@@ -64,7 +64,8 @@ read_checkpoint -cell led_cnt3_pr_inst RM2_post_synth_led_cnt3_HH.dcp
 #------------------------------------------------------------------------------
 # New RM or modified RM only, in full BUILD (full design already run once for static region)
 
-tclsh BUILD.tcl -RP led_cnt3_pr -RM led_cnt3_HH.sv RM2  ;# -RP <moduleName> -RM <filename> <RPdir>
+tclsh BUILD.tcl -RP led_cnt3_pr -RM led_cnt3_HH.sv RM2  ;# -RP <moduleName> -RM <filename> <RMdir>
+tclsh BUILD.tcl -RM RM2/led_cnt3_HH.sv
 # this will be partial RP/RM command
 # add error checking: -RP / -RM must coincide
 #                     each must be compatible with each other
@@ -73,22 +74,22 @@ tclsh BUILD.tcl -RP led_cnt3_pr -RM led_cnt3_HH.sv RM2  ;# -RP <moduleName> -RM 
 # first synth the new/modified module
 # syn_rm.tcl, dont loop, just the one module
 
-# RPonly = led_cnt3_pr      argv
-# RMonly = led_cnt3_HH.sv   argv
-# RPdir  = RM2  ** need to get this automatically somehow from populated RPs/RMs
-if {$RPonly != ""} {
-  read_verilog $hdlDir/$RPdir/$RMonly
-  synth_design -mode out_of_context -top $RPonly -part $partNum
-  write_checkpoint -force $rmDir/dcp/$RPdir/$RPdir\_post_synth_[file rootname $RMonly].dcp
+# RMmodName = led_cnt3_pr   argv
+# RMfname = led_cnt3_HH.sv  argv
+# RMdir  = RM2  ** need to get this automatically somehow from populated RPs/RMs
+if {$RMmodName != ""} {
+  read_verilog $hdlDir/$RMdir/$RMfname
+  synth_design -mode out_of_context -top $RMmodName -part $partNum
+  write_checkpoint -force $rmDir/dcp/$RMdir/$RMdir\_post_synth_[file rootname $RMfname].dcp
 }
 
 # skip synth
 # imp.tcl
 # open abs shell only
 #open_checkpoint led_cnt3_pr_AbSh.dcp
-open_checkpoint $RPonly\_AbSh.dcp
+open_checkpoint $RMmodName\_AbSh.dcp
 #read_checkpoint -cell led_cnt3_pr_inst RM2_post_synth_led_cnt3_HH.dcp
-read_checkpoint -cell $RPonly\_inst $outputDir/dcp/$RPdir\_post_synth_[file rootname $RMonly].dcp
+read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir\_post_synth_[file rootname $RMfname].dcp
   
   opt_design
   place_design
@@ -96,4 +97,16 @@ read_checkpoint -cell $RPonly\_inst $outputDir/dcp/$RPdir\_post_synth_[file root
   route_design
 
   #write_bitstream -force -cell led_cnt3_pr_inst led_cnt3_HH.bit
-  write_bitstream -force -cell $RPonly\_inst $outputDir/bit/$RPdir/$RPdir\_[file rootname $RMonly]_partial.bit
+  write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_[file rootname $RMfname]_partial.bit
+
+
+
+
+#------------------------------------------------------------------------------
+
+# Format for $RPs:  RM0 <RP0_module_name> RM1 <RP1_module_name> ... etc.
+#                   RM0 led_cnt_pr RM1 led_cnt2_pr RM2 led_cnt3_pr RM4 axil_reg32_2
+#
+# Reconfigurable module is any module that coincides with a specific RP.
+# Format for $RMs:  RM0 {RM0_A.sv RM0_B.sv RM0_C.sv} RM1 {RM1_A.sv RM1_B.sv} ... etc.
+#                   RM0 {led_cnt_A.sv led_cnt_B.sv led_cnt_C.sv} RM1 {led_cnt2_A.sv led_cnt2_B.sv led_cnt2_C.sv} RM2 {led_cnt3_A.sv led_cnt3_HH.sv} RM4 {axil_reg32_A.v axil_reg32_B.v}

@@ -391,6 +391,71 @@ proc getDFXconfigs {} {
   set RMs [lsort -stride 2 -index 0 [array get RParray]]
   set RPs [lsort -stride 2 -index 0 [array get RPinstArray]]
   set RPlen [expr [llength $RMs]/2]
+
+  ####
+  upvar argv argv
+  upvar argc argc
+  upvar RMfname RMfname
+  upvar RMmodName RMmodName
+  upvar RMdir RMdir
+
+  if {("-RM" in $argv)} {getRMabstract}
+}
+
+#--------------------------------------------------------------------------------------------------
+# single RM build, partial bit, abstract shell
+#--------------------------------------------------------------------------------------------------
+proc getRMabstract {} {
+  upvar RMs RMs
+  upvar RPs RPs 
+  upvar argv argv
+  upvar argc argc
+  upvar RMfname RMfname
+  upvar RMmodName RMmodName
+  upvar RMdir RMdir
+
+  set RMidx [lsearch $argv "-RM"]
+  set RMidx [expr $RMidx + 1]
+  if {$RMidx == $argc} {
+    puts "ERROR in proc getRMabstract";exit; # this will only occur if -RM is last arg with nothing following
+  } else {
+    set RMvalue [lindex $argv $RMidx]
+  }
+
+  # split the dir and filename
+  set RMdir  [string range $RMvalue 0 [expr {[string first "/" $RMvalue] - 1}]]
+  set RMfname [string range $RMvalue [expr {[string first "/" $RMvalue] + 1}] end]
+
+  # now search RMs and get the index of the file list that the user entered file falls under
+  set RMidx -1;# reuse var
+  set index 0 
+  foreach rmVal $RMs {
+    if {[lsearch $rmVal $RMfname] != -1} {
+      set RMidx $index
+      break
+    }
+    incr index
+  }
+  
+  if {$RMidx == -1} {
+    puts "ERROR in proc getRMabstract. Can't find RM file: $RMfname";exit;
+  } else {
+    set RMdirCheck [lindex $RMs [expr $RMidx - 1]]
+    set RPdirCheck [lindex $RPs [expr $RMidx - 1]]
+  }
+
+  # error checking. the RM* directory entered by the user must be equal to what is parsed and set in RMs and RPs
+  # and it must coincide with the correct file found in RMs
+  if {!($RMdirCheck == $RMdir && $RPdirCheck == $RMdir)} {
+    puts "ERROR in proc getRMabstract. RMdir ($RMdir) not matching values in RMs/RPs";exit;
+  }
+
+  # if the above error checks pass, this should too
+  set RMmodName [lindex $RPs [expr $RMidx]]
+
+  #puts "RMfname: $RMfname"
+  #puts "RMmodName: $RMmodName"
+  #puts "RMdir: $RMdir"
 }
 
 #--------------------------------------------------------------------------------------------------

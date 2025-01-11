@@ -26,12 +26,27 @@ proc place_n_route {name} {
 # main script 
 #--------------------------------------------------------------------------------------------------
 
-set RMs       [lindex $argv 0]
-set outputDir [lindex $argv 1]
-set RPs       [lindex $argv 2]
-set RPlen     [lindex $argv 3]
-set buildTime [lindex $argv 4]
-set MaxRMs    [lindex $argv 5]
+set RMs         [lindex $argv 0]
+set outputDir   [lindex $argv 1]
+set RPs         [lindex $argv 2]
+set RPlen       [lindex $argv 3]
+set buildTime   [lindex $argv 4]
+set MaxRMs      [lindex $argv 5]
+set RMmodName   [lindex $argv 6]
+set RMfname     [lindex $argv 7]
+set RMdir       [lindex $argv 8]
+
+#--------------------------------------------------------------------------------------------------
+
+if {$RMmodName != ""} {
+  open_checkpoint $outputDir/dcp/$RMdir/$RMdir\_AbShell.dcp
+  read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir/$RMdir\_post_synth_[file rootname $RMfname].dcp
+  place_n_route "$RMdir\_$RMmodName\_[file rootname $RMfname]"
+  write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_[file rootname $RMfname]_partial.bit
+  return ;# done, return from this script
+}
+
+#--------------------------------------------------------------------------------------------------
 
 set staticDFX false ;# temporary - run empty static build for DFX runs? arg for this option?
 

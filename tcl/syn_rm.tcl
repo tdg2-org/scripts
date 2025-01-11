@@ -15,7 +15,9 @@ set RMs         [lindex $argv 2]
 set rmDir       [lindex $argv 3]  ;# output products dir
 set RPs         [lindex $argv 4]  ;# module name
 set RPlen       [lindex $argv 5]
-
+set RMmodName   [lindex $argv 6]
+set RMfname     [lindex $argv 7]
+set RMdir       [lindex $argv 8]
 
 # files common to RMs and static in common folder
 set     commonFilesVerilog      [glob -nocomplain -tails -directory $hdlDir/common *.v]
@@ -24,6 +26,15 @@ append  commonFilesVerilog " "  [glob -nocomplain -tails -directory $hdlDir/comm
 foreach x $commonFilesVerilog {
   read_verilog  $hdlDir/common/$x
 }
+
+
+if {$RMmodName != ""} {
+  read_verilog $hdlDir/$RMdir/$RMfname
+  synth_design -mode out_of_context -top $RMmodName -part $partNum
+  write_checkpoint -force $rmDir/dcp/$RMdir/$RMdir\_post_synth_[file rootname $RMfname].dcp
+  return ;# done, return from this script
+}
+
 
 # loop through every RM per RP, and synthesize all
 for {set idx 0} {$idx <$RPlen} {incr idx} {
