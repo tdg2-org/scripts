@@ -27,7 +27,7 @@ foreach x $commonFilesVerilog {
   read_verilog  $hdlDir/common/$x
 }
 
-
+# DFX partial only
 if {$RMmodName != ""} {
   read_verilog $hdlDir/$RMdir/$RMfname
   synth_design -mode out_of_context -top $RMmodName -part $partNum

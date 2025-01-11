@@ -37,7 +37,7 @@ set RMfname     [lindex $argv 7]
 set RMdir       [lindex $argv 8]
 
 #--------------------------------------------------------------------------------------------------
-
+# DFX partial only
 if {$RMmodName != ""} {
   open_checkpoint $outputDir/dcp/$RMdir/$RMdir\_AbShell.dcp
   read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir/$RMdir\_post_synth_[file rootname $RMfname].dcp
