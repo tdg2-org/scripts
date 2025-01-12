@@ -133,7 +133,7 @@ proc getOutputDir {} {
 }
 
 #--------------------------------------------------------------------------------------------------
-# 
+# End of build print info
 #--------------------------------------------------------------------------------------------------
 proc buildTimeEnd {} {
   upvar startTime startTime
@@ -143,6 +143,9 @@ proc buildTimeEnd {} {
   upvar projName projName
   upvar topBDtcl topBDtcl
   upvar topBD topBD
+  upvar RMfname RMfname
+  upvar RMmodName RMmodName
+  upvar RMdir RMdir
 
   set endTime     [clock seconds]
   set buildTime   [expr $endTime - $startTime]
@@ -150,7 +153,14 @@ proc buildTimeEnd {} {
   set buildSecRem [expr $buildTime % 60]
   
   puts "\n------------------------------------------"
-  puts "** BUILD COMPLETE ** $buildTimeStamp\_$ghash_msb\n"
+  if {$RMdir != ""} {
+    puts "** DFX Partial BUILD COMPLETE **"
+    puts "RM File Name    : $RMfname"
+    puts "RM Module Name  : $RMmodName"
+    puts "RM Directory    : $RMdir\n"
+  } else {
+    puts "** BUILD COMPLETE ** $buildTimeStamp\_$ghash_msb\n"
+  }
   puts "Output products directory : $outputDir"
   puts "BD project name           : $projName"
   puts "BD project tcl script     : $topBDtcl.tcl"

@@ -42,10 +42,6 @@ set RMfname ""    ;# Single RM only, partial bitstream, using abstract shell. RM
 set RMmodName ""  ;# Single RM only, partial bitstream, using abstract shell. RM module name for RMfname.
 set RMdir  ""     ;# Single RM only, partial bitstream, using abstract shell. RM directory for RMfname.
 if {!("-noRM" in $argv)} {getDFXconfigs} ;# Proc to populate DFX vars/lists above.
-  puts "RMfname: $RMfname"
-  puts "RMmodName: $RMmodName"
-  puts "RMdir: $RMdir"
-  #puts "DONE";exit;
 #--------------------------------------------------------------------------------------------------
 # Pre-build stuff
 #--------------------------------------------------------------------------------------------------
