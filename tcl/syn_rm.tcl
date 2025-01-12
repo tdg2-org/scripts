@@ -44,19 +44,13 @@ set_part $partNum
 set     commonFilesHDL      [glob -nocomplain -tails -directory $hdlDir/common *.v]
 append  commonFilesHDL  " " [glob -nocomplain -tails -directory $hdlDir/common *.sv]
 append  commonFilesHDL  " " [glob -nocomplain -tails -directory $hdlDir/common *.vhd]
-foreach x $commonFilesHDL {
-  readHDL  $hdlDir/common/$x
-}
+foreach x $commonFilesHDL {readHDL  $hdlDir/common/$x}
 
 set  commonFilesHDL2008   [glob -nocomplain -tails -directory $hdlDir/common/2008 *.vhd]
-foreach x $commonFilesHDL2008 {
-  readHDL  $hdlDir/common/2008/$x
-}
+foreach x $commonFilesHDL2008 {readHDL  $hdlDir/common/2008/$x}
 
 set  commonFilesHDL2019   [glob -nocomplain -tails -directory $hdlDir/common/2019 *.vhd]
-foreach x $commonFilesHDL2019 {
-  readHDL  $hdlDir/common/2019/$x
-}
+foreach x $commonFilesHDL2019 {readHDL  $hdlDir/common/2019/$x}
 
 # DFX partial only
 # RMmodName will contain 2008/2019 folder for vhdl as part of the filename, if it exists
