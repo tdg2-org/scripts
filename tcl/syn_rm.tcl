@@ -29,7 +29,13 @@ foreach x $commonFilesVerilog {
 
 # DFX partial only
 if {$RMmodName != ""} {
-  read_verilog $hdlDir/$RMdir/$RMfname
+  set RMfType [file extension $RMfname]
+  if {$RMfType eq ".v" || $RMfType eq ".sv"} {
+    read_verilog $hdlDir/$RMdir/$RMfname
+  } else {
+    #read_vhdl ‑library work $hdlDir/$RMdir/$RMfname
+    read_vhdl -library "work" "$hdlDir/$RMdir/$RMfname"
+  }
   synth_design -mode out_of_context -top $RMmodName -part $partNum
   write_checkpoint -force $rmDir/dcp/$RMdir/$RMdir\_post_synth_[file rootname $RMfname].dcp
   return ;# done, return from this script

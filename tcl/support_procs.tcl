@@ -345,6 +345,21 @@ proc findModuleName {fileName} {
 
 #--------------------------------------------------------------------------------------------------
 # helper for getDFXconfigs
+# parse hdl file to get vhdl entity name
+#--------------------------------------------------------------------------------------------------
+proc findEntityName {fileName} {
+  set fid [open $fileName r]
+  set text [read $fid] 
+  close $fid 
+  if {[regexp -nocase {entity\s+(\S+)} $text match moduleName]} {
+    return $moduleName
+  } else {
+    error "ERROR parsing for module name in $fileName. EXITING"
+  }
+}
+
+#--------------------------------------------------------------------------------------------------
+# helper for getDFXconfigs
 # every RM hdl file in a DFX directory (RM*,) must have identical module names. This verifies
 #--------------------------------------------------------------------------------------------------
 proc verifyModuleNames {moduleList} {
@@ -373,27 +388,37 @@ proc verifyModuleNames {moduleList} {
 #   need to loop through RPs (multiple DFX regions)
 #--------------------------------------------------------------------------------------------------
 proc getDFXconfigs {} {
+  upvar argv argv
+  upvar argc argc
   upvar hdlDir hdlDir
   upvar RMs RMs
   upvar RPs RPs 
   upvar RPlen RPlen
   upvar MaxRMs MaxRMs
+
   # first get all directories in hdl that have 'RM*' name
   set RMDirs [glob -nocomplain -tails -directory $hdlDir -type d RM*]
   if {$RMDirs==""} {return} ;# no RMs therefore no DFX - DONE
 
   # now search each RM Dir to get RMs for each
   foreach x $RMDirs {
+    set     filesVhdl         [glob -nocomplain -tails -directory $hdlDir/$x *.vhd]
     set     filesVerilog      [glob -nocomplain -tails -directory $hdlDir/$x *.v]
     append  filesVerilog " "  [glob -nocomplain -tails -directory $hdlDir/$x *.sv]
-    set filesVerilog [lsort $filesVerilog]
+    set filesVerilog  [lsort $filesVerilog]
+    set filesVhdl     [lsort $filesVhdl]
     set rmModName ""
     foreach vFile $filesVerilog {
       append rmModName " " [findModuleName $hdlDir/$x/$vFile] ;# parse file for module name
     }
+    foreach vhdFile $filesVhdl {
+      append rmModName " " [findEntityName $hdlDir/$x/$vhdFile] ;# parse file for entity name
+    }
     verifyModuleNames $rmModName ;# verify all match otherwise error/quit
-    if {[expr {[llength $filesVerilog] > $MaxRMs}]} {set MaxRMs [llength $filesVerilog]} ;# need number of RMs in RP that has the most RMs
-    set RParray($x) $filesVerilog 
+    set filesHDL $filesVerilog
+    append filesHDL " " $filesVhdl
+    if {[expr {[llength $filesHDL] > $MaxRMs}]} {set MaxRMs [llength $filesHDL]} ;# need number of RMs in RP that has the most RMs
+    set RParray($x) $filesHDL 
     set RPname [lindex $rmModName 0]
     set RPinstArray($x) $RPname
 
@@ -402,14 +427,13 @@ proc getDFXconfigs {} {
   set RPs [lsort -stride 2 -index 0 [array get RPinstArray]]
   set RPlen [expr [llength $RMs]/2]
 
-  ####
-  upvar argv argv
-  upvar argc argc
-  upvar RMfname RMfname
-  upvar RMmodName RMmodName
-  upvar RMdir RMdir
-
-  if {("-RM" in $argv)} {getRMabstract}
+  # partial run only
+  if {("-RM" in $argv)} {
+    upvar RMfname RMfname
+    upvar RMmodName RMmodName
+    upvar RMdir RMdir
+    getRMabstract
+  }
 }
 
 #--------------------------------------------------------------------------------------------------
