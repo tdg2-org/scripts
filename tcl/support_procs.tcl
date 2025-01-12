@@ -403,8 +403,19 @@ proc getDFXconfigs {} {
   # now search each RM Dir to get RMs for each
   foreach x $RMDirs {
     set     filesVhdl         [glob -nocomplain -tails -directory $hdlDir/$x *.vhd]
+    set     filesVhdl2008     [glob -nocomplain -tails -directory $hdlDir/$x/2008 *.vhd]
+    set     filesVhdl2019     [glob -nocomplain -tails -directory $hdlDir/$x/2019 *.vhd]
+
+    set result [list]
+    foreach file $filesVhdl2008 {lappend result "2008/$file"}
+    append  filesVhdl     " " $result
+
+    set result [list]
+    foreach file $filesVhdl2019 {lappend result "2019/$file"}
+    append  filesVhdl     " " $result
+
     set     filesVerilog      [glob -nocomplain -tails -directory $hdlDir/$x *.v]
-    append  filesVerilog " "  [glob -nocomplain -tails -directory $hdlDir/$x *.sv]
+    append  filesVerilog  " " [glob -nocomplain -tails -directory $hdlDir/$x *.sv]
     set filesVerilog  [lsort $filesVerilog]
     set filesVhdl     [lsort $filesVhdl]
     set rmModName ""
@@ -426,6 +437,9 @@ proc getDFXconfigs {} {
   set RMs [lsort -stride 2 -index 0 [array get RParray]]
   set RPs [lsort -stride 2 -index 0 [array get RPinstArray]]
   set RPlen [expr [llength $RMs]/2]
+
+  #puts "RMs: $RMs"
+  #puts "RPs: $RPs"
 
   # partial run only
   if {("-RM" in $argv)} {

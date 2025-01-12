@@ -39,10 +39,16 @@ set RMdir       [lindex $argv 8]
 #--------------------------------------------------------------------------------------------------
 # DFX partial only
 if {$RMmodName != ""} {
+  set RMfnameRoot [file rootname $RMfname]
+
   open_checkpoint $outputDir/dcp/$RMdir/$RMdir\_AbShell.dcp
-  read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir/$RMdir\_post_synth_[file rootname $RMfname].dcp
-  place_n_route "$RMdir\_$RMmodName\_[file rootname $RMfname]"
-  write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_[file rootname $RMfname]_partial.bit
+  read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir/$RMdir\_post_synth_$RMfnameRoot.dcp
+  place_n_route "$RMdir\_$RMmodName\_$RMfnameRoot"
+
+  if {[string match "2008/*" $RMfnameRoot]} {set RMfnameRoot [string trimleft $RMfnameRoot "2008/"]}
+  if {[string match "2019/*" $RMfnameRoot]} {set RMfnameRoot [string trimleft $RMfnameRoot "2019/"]}
+
+  write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit
   return ;# done, return from this script
 }
 

@@ -19,6 +19,8 @@ set RMmodName   [lindex $argv 6]
 set RMfname     [lindex $argv 7]
 set RMdir       [lindex $argv 8]
 
+set_part $partNum
+
 # files common to RMs and static in common folder
 set     commonFilesVerilog      [glob -nocomplain -tails -directory $hdlDir/common *.v]
 append  commonFilesVerilog " "  [glob -nocomplain -tails -directory $hdlDir/common *.sv]
@@ -32,8 +34,11 @@ if {$RMmodName != ""} {
   set RMfType [file extension $RMfname]
   if {$RMfType eq ".v" || $RMfType eq ".sv"} {
     read_verilog $hdlDir/$RMdir/$RMfname
+  } elseif {[string match "2008/*" $RMfname]} {
+    read_vhdl -library "work" -vhdl2008 "$hdlDir/$RMdir/$RMfname"
+  } elseif {[string match "2019/*" $RMfname]} {
+    read_vhdl -library "work" -vhdl2019 "$hdlDir/$RMdir/$RMfname"
   } else {
-    #read_vhdl ‑library work $hdlDir/$RMdir/$RMfname
     read_vhdl -library "work" "$hdlDir/$RMdir/$RMfname"
   }
   synth_design -mode out_of_context -top $RMmodName -part $partNum
