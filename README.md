@@ -94,6 +94,10 @@
 > tclsh BUILD.tcl -clean -cfg custPL_TPG1080_addsub  
 > tclsh BUILD.tcl -clean -name PRJ_custPL_TPG1080_addsub -out output_products_custPL_TPG1080_addsub -skipBD -skipIP  
 
+> tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM1/led_cnt2_D2.sv  
+> tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd  
+> tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd -skipRM  
+> tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2019/led_cnt3_U.vhd  
 
 # DFX
 - This version is automated. Verified on U96 with three RPs and three RMs each.
