@@ -61,7 +61,7 @@ if {$RMs==""} {set DFXrun false} else {set DFXrun true}
 open_checkpoint $outputDir/dcp/top_synth.dcp
 
 for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i.e. no RMs/RPs i.e. no DFX
-  set cfgName "CONFIG"
+  set cfgName "CONFIG-ROUTED"
   for {set x 1} {$x < [llength $RPs]} {incr x 2} {
     set curRPinst "[lindex $RPs $x]_inst"
     set curRPdir [lindex $RPs [expr $x-1]]  
@@ -91,7 +91,7 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
     set githash_cells_path [get_cells -hierarchical *user_init_64b_inst*]                  
     source ./tcl/load_git_hash.tcl                                                             
     set_property BITSTREAM.CONFIG.USR_ACCESS $buildTime [current_design]                   
-    write_checkpoint -force $outputDir/dcp/$cfgName\_ROUTED.dcp
+    write_checkpoint -force $outputDir/dcp/$cfgName.dcp
     
     #loop through and generate abstract shells for each RP
     for {set x 1} {$x < [llength $RPs]} {incr x 2} {
