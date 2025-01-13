@@ -1,1 +1,0 @@
-read_vhdl -vhdl2008 ../hdl/RM2/v2008/led_cnt3_T.vhd
