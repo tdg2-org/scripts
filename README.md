@@ -5,6 +5,10 @@
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
+### VHDL-2008/2019 now automated. 
+  Non 2008/1029 VHDL files can be in the same directories as verilog/systemverilog. Any 2008/2019 
+  must be in 2008 or 2019 folders.
+
 ## script to build : BUILD.tcl
 > tclsh BUILD.tcl
 
@@ -34,6 +38,12 @@
 -noIP       : run as if there are no IP in the IP/tcl folder (even if there are).
 
 -noRM       : run as if there are no RMs in the RM* folders (even if there are).
+
+-RM         : "-RM RM*/<RM_module>.sv" DFX abstract shell partial build for reconfigurable module only. 
+              Full build of individual RM up to partial bitstream. Requires initial full build for 
+              static region and abstract shell checkpoint. All HDL types automated, including vhdl 
+              2008/2019. For vhdl-2008/2019, these files must be in a "2008" or "2019" folder, command
+              example would be: "-RM RM0/2008/<myModule>.vhd".
 
 -proj       : generate BD project only. must be run with -name option.
 
