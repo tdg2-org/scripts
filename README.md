@@ -111,14 +111,14 @@
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2019/led_cnt3_U.vhd  
 
 # DFX
-- This version is automated. Verified on U96 with three RPs and three RMs each.
+- Nested-DFX not supported.
 - RMs must be in folders named RM* in hdl directory.
 - Each RM must have same module name.
-- RM folders are parsed to get module names.
-- RP instance in static region MUST be named "\<RM module name>_inst"
+- RM folders are parsed to get module/entity names.
+- RP instance in static region MUST be named "\<RM_module/entity_name>_inst"
   - Ex. RM0 = "led_cnt_pr", instance in io_top must be "led_cnt_pr_inst".
 - Currently, only one full config is built. This will be the 'first' RM for each RP which are sorted ASCII.
-  - Empty static is not built, there is an option to enable this in 'imp.tcl'.
-  - All partial bitstreams are generated.
+  - Empty static is not built, there is an option to enable this in 'imp.tcl' (not tested).
+  - All partial bitstreams are generated, in addition to RMs not part of the single full config.
+- Abstract shell checkpoints are generated for all RPs. Build new/modified RMs and partial bitsreams with -RM option.
 - All HDL types including VHDL-2008/2019. Any 2008/2019 files must be in respective 2008/2019 folders.
-- Abstract shell checkpoints are generated for all RMs. Build new/modified RMs and partial bitsreams with -RM option.
