@@ -6,8 +6,8 @@
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
 ### VHDL-2008/2019 now automated. 
-  Non 2008/1029 VHDL files can be in the same directories as verilog/systemverilog. Any 2008/2019 
-  must be in 2008 or 2019 folders.
+  Non-2008/2019 VHDL files can be in the same directories as verilog/systemverilog. Any VHDL-2008/2019 
+  files must be in 2008 or 2019 folders.
 
 ## script to build : BUILD.tcl
 > tclsh BUILD.tcl
@@ -104,6 +104,7 @@
 > tclsh BUILD.tcl -clean -cfg custPL_TPG1080_addsub  
 > tclsh BUILD.tcl -clean -name PRJ_custPL_TPG1080_addsub -out output_products_custPL_TPG1080_addsub -skipBD -skipIP  
 
+#### With a full DFX design already run, build a single RM only and generate partial bitstream. BD project and IP already generated. 
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM1/led_cnt2_D2.sv  
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd  
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd -skipRM  
@@ -119,4 +120,5 @@
 - Currently, only one full config is built. This will be the 'first' RM for each RP which are sorted ASCII.
   - Empty static is not built, there is an option to enable this in 'imp.tcl'.
   - All partial bitstreams are generated.
-- No VHDL. Verilog and systemverilog only.
+- All HDL types including VHDL-2008/2019. Any 2008/2019 files must be in respective 2008/2019 folders.
+- Abstract shell checkpoints are generated for all RMs. Build new/modified RMs and partial bitsreams with -RM option.
