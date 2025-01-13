@@ -40,14 +40,12 @@ set RMdir       [lindex $argv 8]
 # DFX partial only
 if {$RMmodName != ""} {
   set RMfnameRoot [file rootname $RMfname]
+  if {[string match "2008/*" $RMfnameRoot]} {set RMfnameRoot [string trimleft $RMfnameRoot "2008/"]}
+  if {[string match "2019/*" $RMfnameRoot]} {set RMfnameRoot [string trimleft $RMfnameRoot "2019/"]}
 
   open_checkpoint $outputDir/dcp/$RMdir/$RMdir\_AbShell.dcp
   read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir/$RMdir\_post_synth_$RMfnameRoot.dcp
   place_n_route "$RMdir\_$RMmodName\_$RMfnameRoot"
-
-  if {[string match "2008/*" $RMfnameRoot]} {set RMfnameRoot [string trimleft $RMfnameRoot "2008/"]}
-  if {[string match "2019/*" $RMfnameRoot]} {set RMfnameRoot [string trimleft $RMfnameRoot "2019/"]}
-
   write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit
   return ;# done, return from this script
 }
@@ -70,7 +68,9 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
     if {[lindex [lindex $RMs $x] $config] == ""} {
       continue  ;# next is empty (no more RMs for this RP), so leave as previous and skip read_checkpoint
     } else {
-      set RM [file rootname [lindex [lindex $RMs $x] $config]]
+      set RM [file rootname [lindex [lindex $RMs $x] $config]] ;# the format here is the file without extension
+      if {[string match "2008/*" $RM]} {set RM [string trimleft $RM "2008/"]} ;# added these for addition of vhdl 2008/2019 automation
+      if {[string match "2019/*" $RM]} {set RM [string trimleft $RM "2019/"]}
     }
     
     #puts "assembling config RP:$curRPinst in $curRPdir with $RM"
@@ -83,6 +83,7 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
     read_checkpoint -cell $curRPinst $outputDir/dcp/$curRPdir/$curRPdir\_post_synth_$RM.dcp ;# populate RP with next RM synth dcp
     append cfgName "-" $curRPdir\_$RM
   }
+
   # now have a config all RPs populated with RMs. time to P&R
   place_n_route $cfgName
   # this is where updates necessary if other configurations are desired. currently only one (first) config is built
@@ -112,6 +113,8 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
       continue
     } else {
       set RM [file rootname [lindex [lindex $RMs $x] $config]]
+      if {[string match "2008/*" $RM]} {set RM [string trimleft $RM "2008/"]} ;# added these for addition of vhdl 2008/2019 automation
+      if {[string match "2019/*" $RM]} {set RM [string trimleft $RM "2019/"]}
       if {![file exists $outputDir/bit/$curRPdir]} {file mkdir $outputDir/bit/$curRPdir}
       write_bitstream -force -cell $curRPinst $outputDir/bit/$curRPdir/$curRPdir\_$RM\_partial.bit
     }

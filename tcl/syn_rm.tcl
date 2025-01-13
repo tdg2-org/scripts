@@ -57,7 +57,10 @@ foreach x $commonFilesHDL2019 {readHDL  $hdlDir/common/2019/$x}
 if {$RMmodName != ""} {
   readHDL $hdlDir/$RMdir/$RMfname
   synth_design -mode out_of_context -top $RMmodName -part $partNum
-  write_checkpoint -force $outputDir/dcp/$RMdir/$RMdir\_post_synth_[file rootname $RMfname].dcp
+  set fileRootName [file rootname $RMfname]
+  if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}
+  if {[string match "2019/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2019/"]}
+  write_checkpoint -force $outputDir/dcp/$RMdir/$RMdir\_post_synth_$fileRootName.dcp
   return ;# done, return from this script
 }
 
