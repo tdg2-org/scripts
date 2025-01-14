@@ -1,9 +1,17 @@
+#### Current tool/OS versions:
+  - Vivado/Vitis 2023.2
+  - Ubuntu 22.04.5 LTS
+
 ### TODO: 
 - -skipIMP and -skipSYN args will not create the output_products folder, need to check if exists first, create only if NOT exist
 - Many updates not verified with DFX build, need to test.
 - helpMsg needs update.
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
+
+### VHDL-2008/2019 now automated. 
+  Non-2008/2019 VHDL files can be in the same directories as verilog/systemverilog. Any VHDL-2008/2019 
+  files must be in 2008 or 2019 folders.
 
 ## script to build : BUILD.tcl
 > tclsh BUILD.tcl
@@ -34,6 +42,12 @@
 -noIP       : run as if there are no IP in the IP/tcl folder (even if there are).
 
 -noRM       : run as if there are no RMs in the RM* folders (even if there are).
+
+-RM         : "-RM RM*/<RM_module>.sv" DFX abstract shell partial build for reconfigurable module only. 
+              Full build of individual RM up to partial bitstream. Requires initial full build for 
+              static region and abstract shell checkpoint. All HDL types automated, including vhdl 
+              2008/2019. For vhdl-2008/2019, these files must be in a "2008" or "2019" folder, command
+              example would be: "-RM RM0/2008/MyModule.vhd".
 
 -proj       : generate BD project only. must be run with -name option.
 
@@ -94,15 +108,21 @@
 > tclsh BUILD.tcl -clean -cfg custPL_TPG1080_addsub  
 > tclsh BUILD.tcl -clean -name PRJ_custPL_TPG1080_addsub -out output_products_custPL_TPG1080_addsub -skipBD -skipIP  
 
+#### With a full DFX design already run, build a single RM only and generate partial bitstream. BD project and IP already generated. 
+> tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM1/led_cnt2_D2.sv  
+> tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd  
+> tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd -skipRM  
+> tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2019/led_cnt3_U.vhd  
 
 # DFX
-- This version is automated. Verified on U96 with three RPs and three RMs each.
+- Nested-DFX not supported.
 - RMs must be in folders named RM* in hdl directory.
 - Each RM must have same module name.
-- RM folders are parsed to get module names.
-- RP instance in static region MUST be named "\<RM module name>_inst"
+- RM folders are parsed to get module/entity names.
+- RP instance in static region MUST be named "\<RM_module/entity_name>_inst"
   - Ex. RM0 = "led_cnt_pr", instance in io_top must be "led_cnt_pr_inst".
 - Currently, only one full config is built. This will be the 'first' RM for each RP which are sorted ASCII.
-  - Empty static is not built, there is an option to enable this in 'imp.tcl'.
-  - All partial bitstreams are generated.
-- No VHDL. Verilog and systemverilog only.
+  - Empty static is not built, there is an option to enable this in 'imp.tcl' (not tested).
+  - All partial bitstreams are generated, in addition to RMs not part of the single full config.
+- Abstract shell checkpoints are generated for all RPs. Build new/modified RMs and partial bitsreams with -RM option.
+- All HDL types including VHDL-2008/2019. Any 2008/2019 files must be in respective 2008/2019 folders.

@@ -133,7 +133,7 @@ proc getOutputDir {} {
 }
 
 #--------------------------------------------------------------------------------------------------
-# 
+# End of build print info
 #--------------------------------------------------------------------------------------------------
 proc buildTimeEnd {} {
   upvar startTime startTime
@@ -143,6 +143,9 @@ proc buildTimeEnd {} {
   upvar projName projName
   upvar topBDtcl topBDtcl
   upvar topBD topBD
+  upvar RMfname RMfname
+  upvar RMmodName RMmodName
+  upvar RMdir RMdir
 
   set endTime     [clock seconds]
   set buildTime   [expr $endTime - $startTime]
@@ -150,7 +153,14 @@ proc buildTimeEnd {} {
   set buildSecRem [expr $buildTime % 60]
   
   puts "\n------------------------------------------"
-  puts "** BUILD COMPLETE ** $buildTimeStamp\_$ghash_msb\n"
+  if {$RMdir != ""} {
+    puts "** DFX Partial BUILD COMPLETE **"
+    puts "RM File Name    : $RMfname"
+    puts "RM Module Name  : $RMmodName"
+    puts "RM Directory    : $RMdir\n"
+  } else {
+    puts "** BUILD COMPLETE ** $buildTimeStamp\_$ghash_msb\n"
+  }
   puts "Output products directory : $outputDir"
   puts "BD project name           : $projName"
   puts "BD project tcl script     : $topBDtcl.tcl"
@@ -335,6 +345,21 @@ proc findModuleName {fileName} {
 
 #--------------------------------------------------------------------------------------------------
 # helper for getDFXconfigs
+# parse hdl file to get vhdl entity name
+#--------------------------------------------------------------------------------------------------
+proc findEntityName {fileName} {
+  set fid [open $fileName r]
+  set text [read $fid] 
+  close $fid 
+  if {[regexp -nocase {entity\s+(\S+)} $text match moduleName]} {
+    return $moduleName
+  } else {
+    error "ERROR parsing for module name in $fileName. EXITING"
+  }
+}
+
+#--------------------------------------------------------------------------------------------------
+# helper for getDFXconfigs
 # every RM hdl file in a DFX directory (RM*,) must have identical module names. This verifies
 #--------------------------------------------------------------------------------------------------
 proc verifyModuleNames {moduleList} {
@@ -363,27 +388,48 @@ proc verifyModuleNames {moduleList} {
 #   need to loop through RPs (multiple DFX regions)
 #--------------------------------------------------------------------------------------------------
 proc getDFXconfigs {} {
+  upvar argv argv
+  upvar argc argc
   upvar hdlDir hdlDir
   upvar RMs RMs
   upvar RPs RPs 
   upvar RPlen RPlen
   upvar MaxRMs MaxRMs
+
   # first get all directories in hdl that have 'RM*' name
   set RMDirs [glob -nocomplain -tails -directory $hdlDir -type d RM*]
   if {$RMDirs==""} {return} ;# no RMs therefore no DFX - DONE
 
   # now search each RM Dir to get RMs for each
   foreach x $RMDirs {
+    set     filesVhdl         [glob -nocomplain -tails -directory $hdlDir/$x *.vhd]
+    set     filesVhdl2008     [glob -nocomplain -tails -directory $hdlDir/$x/2008 *.vhd]
+    set     filesVhdl2019     [glob -nocomplain -tails -directory $hdlDir/$x/2019 *.vhd]
+
+    set result [list]
+    foreach file $filesVhdl2008 {lappend result "2008/$file"}
+    append  filesVhdl     " " $result
+
+    set result [list]
+    foreach file $filesVhdl2019 {lappend result "2019/$file"}
+    append  filesVhdl     " " $result
+
     set     filesVerilog      [glob -nocomplain -tails -directory $hdlDir/$x *.v]
-    append  filesVerilog " "  [glob -nocomplain -tails -directory $hdlDir/$x *.sv]
-    set filesVerilog [lsort $filesVerilog]
+    append  filesVerilog  " " [glob -nocomplain -tails -directory $hdlDir/$x *.sv]
+    set filesVerilog  [lsort $filesVerilog]
+    set filesVhdl     [lsort $filesVhdl]
     set rmModName ""
     foreach vFile $filesVerilog {
       append rmModName " " [findModuleName $hdlDir/$x/$vFile] ;# parse file for module name
     }
+    foreach vhdFile $filesVhdl {
+      append rmModName " " [findEntityName $hdlDir/$x/$vhdFile] ;# parse file for entity name
+    }
     verifyModuleNames $rmModName ;# verify all match otherwise error/quit
-    if {[expr {[llength $filesVerilog] > $MaxRMs}]} {set MaxRMs [llength $filesVerilog]} ;# need number of RMs in RP that has the most RMs
-    set RParray($x) $filesVerilog 
+    set filesHDL $filesVerilog
+    append filesHDL " " $filesVhdl
+    if {[expr {[llength $filesHDL] > $MaxRMs}]} {set MaxRMs [llength $filesHDL]} ;# need number of RMs in RP that has the most RMs
+    set RParray($x) $filesHDL 
     set RPname [lindex $rmModName 0]
     set RPinstArray($x) $RPname
 
@@ -391,6 +437,73 @@ proc getDFXconfigs {} {
   set RMs [lsort -stride 2 -index 0 [array get RParray]]
   set RPs [lsort -stride 2 -index 0 [array get RPinstArray]]
   set RPlen [expr [llength $RMs]/2]
+
+  #puts "RMs: $RMs"
+  #puts "RPs: $RPs"
+
+  # partial run only
+  if {("-RM" in $argv)} {
+    upvar RMfname RMfname
+    upvar RMmodName RMmodName
+    upvar RMdir RMdir
+    getRMabstract
+  }
+}
+
+#--------------------------------------------------------------------------------------------------
+# single RM build, partial bit, abstract shell
+#--------------------------------------------------------------------------------------------------
+proc getRMabstract {} {
+  upvar RMs RMs
+  upvar RPs RPs 
+  upvar argv argv
+  upvar argc argc
+  upvar RMfname RMfname
+  upvar RMmodName RMmodName
+  upvar RMdir RMdir
+
+  set RMidx [lsearch $argv "-RM"]
+  set RMidx [expr $RMidx + 1]
+  if {$RMidx == $argc} {
+    puts "ERROR in proc getRMabstract";exit; # this will only occur if -RM is last arg with nothing following
+  } else {
+    set RMvalue [lindex $argv $RMidx]
+  }
+
+  # split the dir and filename
+  set RMdir  [string range $RMvalue 0 [expr {[string first "/" $RMvalue] - 1}]]
+  set RMfname [string range $RMvalue [expr {[string first "/" $RMvalue] + 1}] end]
+
+  # now search RMs and get the index of the file list that the user entered file falls under
+  set RMidx -1;# reuse var
+  set index 0 
+  foreach rmVal $RMs {
+    if {[lsearch $rmVal $RMfname] != -1} {
+      set RMidx $index
+      break
+    }
+    incr index
+  }
+  
+  if {$RMidx == -1} {
+    puts "ERROR in proc getRMabstract. Can't find RM file: $RMfname";exit;
+  } else {
+    set RMdirCheck [lindex $RMs [expr $RMidx - 1]]
+    set RPdirCheck [lindex $RPs [expr $RMidx - 1]]
+  }
+
+  # error checking. the RM* directory entered by the user must be equal to what is parsed and set in RMs and RPs
+  # and it must coincide with the correct file found in RMs
+  if {!($RMdirCheck == $RMdir && $RPdirCheck == $RMdir)} {
+    puts "ERROR in proc getRMabstract. RMdir ($RMdir) not matching values in RMs/RPs";exit;
+  }
+
+  # if the above error checks pass, this should too
+  set RMmodName [lindex $RPs [expr $RMidx]]
+
+  #puts "RMfname: $RMfname"
+  #puts "RMmodName: $RMmodName"
+  #puts "RMdir: $RMdir"
 }
 
 #--------------------------------------------------------------------------------------------------

@@ -10,6 +10,9 @@
 
 # generate block design with associated dependencies
 # UG994, UG892
+#--------------------------------------------------------------------------------------------------
+# procs
+#--------------------------------------------------------------------------------------------------
 
 proc readVerilog {dir} {
   set     files     [glob -nocomplain -tails -directory $dir *.v]
@@ -18,6 +21,30 @@ proc readVerilog {dir} {
     read_verilog  $dir/$x
   }
 }
+
+proc readHDL {fname} {
+  set fType [file extension $fname]
+  if {$fType eq ".v" || $fType eq ".sv"} {
+    read_verilog $fname
+  } elseif {[string match "2008/*" $fname]} {
+    read_vhdl -library work -vhdl2008 $fname
+  } elseif {[string match "2019/*" $fname]} {
+    read_vhdl -library work -vhdl2019 $fname
+  } else {
+    read_vhdl -library work $fname
+  }
+}
+
+proc getHDLfiles {dir} {
+  set     filesHDL      [glob -nocomplain -tails -directory $dir *.v]
+  append  filesHDL  " " [glob -nocomplain -tails -directory $dir *.sv]
+  append  filesHDL  " " [glob -nocomplain -tails -directory $dir *.vhd]
+  return $filesHDL
+}
+
+#--------------------------------------------------------------------------------------------------
+# main script 
+#--------------------------------------------------------------------------------------------------
 
 set hdlDir    [lindex $argv 0]
 set partNum   [lindex $argv 1]
@@ -33,8 +60,28 @@ set_property TARGET_LANGUAGE Verilog [current_project]
 set_property DEFAULT_LIB work [current_project]
 set_property SOURCE_MGMT_MODE All [current_project]
 
-readVerilog $hdlDir/bd 
-readVerilog $hdlDir/common 
+#readVerilog $hdlDir/bd 
+#readVerilog $hdlDir/common 
+
+set filesHDL  [getHDLfiles $hdlDir/bd]
+foreach x $filesHDL {readHDL  $hdlDir/bd/$x}
+
+set filesHDL  [getHDLfiles $hdlDir/common]
+foreach x $filesHDL {readHDL  $hdlDir/common/$x}
+
+set filesHDL  [getHDLfiles $hdlDir/bd/2008]
+foreach x $filesHDL {readHDL  $hdlDir/bd/2008/$x}
+
+set filesHDL  [getHDLfiles $hdlDir/common/2008]
+foreach x $filesHDL {readHDL  $hdlDir/common/2008/$x}
+
+set filesHDL  [getHDLfiles $hdlDir/bd/2019]
+foreach x $filesHDL {readHDL  $hdlDir/bd/2019/$x}
+
+set filesHDL  [getHDLfiles $hdlDir/common/2019]
+foreach x $filesHDL {readHDL  $hdlDir/common/2019/$x}
+
+
 source $bdDir/$topBDtcl.tcl
 
 # add XCI files here from IP folder
