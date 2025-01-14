@@ -61,25 +61,25 @@
               configured in project mode. do NOT use -skipSYN with this option (synthesis will
               not be run, but syn.tcl is where the full project is populated)
 
--name       : name of BD project to be generated, "-name \<project-name>". Independent of BD 
+-name       : name of BD project to be generated, "-name <project-name>". Independent of BD 
               name and BD tcl script name.
 
--BDtcl      : name of BD tcl script. "-BDtcl \<bd-script-name>". Default is "top_bd" if not 
+-BDtcl      : name of BD tcl script. "-BDtcl <bd-script-name>". Default is "top_bd" if not 
               provided. Generally for debug and future. Script name doesn't need to match BD 
               name defined within the script.
 
--BDName     : name of BD within tcl script. "-BDname \<bd-name>". Default is "top_bd" if not 
+-BDName     : name of BD within tcl script. "-BDname <bd-name>". Default is "top_bd" if not 
               provided.
 
 -verbose    : print script tcl for debug. prevent usage of -notrace for vivado commands.
 
--out        : "-out \<output_products-directory-name>". Custom name of directory location for 
+-out        : "-out <output_products-directory-name>". Custom name of directory location for 
               image, dcp's, logs, etc. Default is "output_products" if not provided.
 
--cfg        : "-cfg \<cfg-name>". configuration that combines -name, -BDtcl, -out. requires 
-              an existing BD tcl script named "top_bd_\<cfg-name>". BD project will be 
-              generated with name "PRJ_\<cfg-name>". output_products/image folder will be 
-              "output_products_\<cfg-name>".
+-cfg        : "-cfg <cfg-name>". configuration that combines -name, -BDtcl, -out. requires 
+              an existing BD tcl script named "top_bd_<cfg-name>". BD project will be 
+              generated with name "PRJ_<cfg-name>". output_products/image folder will be 
+              "output_products_<cfg-name>".
 ```
 
 ## Examples / Quick copies
