@@ -15,7 +15,7 @@
 
 ### HDL Libraries now automated.
   Any HDL files required to be compiled/synthesized in custom libraries must be in folders
-  named "lib_<library-name>". (needs testing)
+  named "lib_\<library-name>". (needs testing)
 
 ## script to build : BUILD.tcl
 > tclsh BUILD.tcl
