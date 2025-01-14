@@ -55,7 +55,8 @@
 -full       : generate FULL project with all sources (buildable in GUI). must use with -proj 
               option. for debug or future use cases. will not work with DFX designs - project 
               will be generated but RMs will need to be manually loaded, and PRs will not be 
-              configured in project mode. do NOT use -skipSYN with this option
+              configured in project mode. do NOT use -skipSYN with this option (synthesis will
+              not be run, but syn.tcl is where the full project is populated)
 
 -name       : name of BD project to be generated, "-name \<project-name>". Independent of BD 
               name and BD tcl script name.
