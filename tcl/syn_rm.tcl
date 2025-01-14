@@ -8,26 +8,9 @@
 # Format for $RMs:  RM0 {RM0_A.sv RM0_B.sv RM0_C.sv} RM1 {RM1_A.sv RM1_B.sv} ... etc.
 #                   RM0 {led_cnt_A.sv led_cnt_B.sv led_cnt_C.sv} RM1 {led_cnt2_A.sv led_cnt2_B.sv led_cnt2_C.sv} RM2 {led_cnt3_A.sv led_cnt3_HH.sv} RM4 {axil_reg32_A.v axil_reg32_B.v}
 
-#--------------------------------------------------------------------------------------------------
-# procs
-#--------------------------------------------------------------------------------------------------
-proc readHDL {fname} {
-  set fType [file extension $fname]
-  if {$fType eq ".v" || $fType eq ".sv"} {
-    read_verilog $fname
-  } elseif {[string match "2008/*" $fname]} {
-    read_vhdl -library work -vhdl2008 $fname
-  } elseif {[string match "2019/*" $fname]} {
-    read_vhdl -library work -vhdl2019 $fname
-  } else {
-    read_vhdl -library work $fname
-  }
-}
 
 #--------------------------------------------------------------------------------------------------
-# main script 
-#--------------------------------------------------------------------------------------------------
-
+source tcl/support_procs.tcl
 
 set hdlDir      [lindex $argv 0]
 set partNum     [lindex $argv 1]
@@ -41,21 +24,15 @@ set RMdir       [lindex $argv 8]
 
 set_part $partNum
 
-set     commonFilesHDL      [glob -nocomplain -tails -directory $hdlDir/common *.v]
-append  commonFilesHDL  " " [glob -nocomplain -tails -directory $hdlDir/common *.sv]
-append  commonFilesHDL  " " [glob -nocomplain -tails -directory $hdlDir/common *.vhd]
-foreach x $commonFilesHDL {readHDL  $hdlDir/common/$x}
+# add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
+# see tcl/support_procs.tcl 
+addHDLdir $hdlDir/common
 
-set  commonFilesHDL2008   [glob -nocomplain -tails -directory $hdlDir/common/2008 *.vhd]
-foreach x $commonFilesHDL2008 {readHDL  $hdlDir/common/2008/$x}
-
-set  commonFilesHDL2019   [glob -nocomplain -tails -directory $hdlDir/common/2019 *.vhd]
-foreach x $commonFilesHDL2019 {readHDL  $hdlDir/common/2019/$x}
 
 # DFX partial only
 # RMmodName will contain 2008/2019 folder for vhdl as part of the filename, if it exists
 if {$RMmodName != ""} {
-  readHDL $hdlDir/$RMdir/$RMfname
+  readHDL $hdlDir/$RMdir/$RMfname ;# single file only
   synth_design -mode out_of_context -top $RMmodName -part $partNum
   set fileRootName [file rootname $RMfname]
   if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}

@@ -558,6 +558,7 @@ proc cleanIP {} {
 #--------------------------------------------------------------------------------------------------
 # Procs for reading HDL
 #--------------------------------------------------------------------------------------------------
+# single file read_vhdl or read_verilog
 proc readHDL {fname} {
   set fType [file extension $fname]
   if {$fType eq ".v" || $fType eq ".sv"} {
@@ -575,6 +576,7 @@ proc readHDL {fname} {
   }
 }
 
+# get list of hdl files .v, .sv, .vhd
 proc getHDLfiles {dir} {
   set     filesHDL      [glob -nocomplain -tails -directory $dir *.v]
   append  filesHDL  " " [glob -nocomplain -tails -directory $dir *.sv]
@@ -582,7 +584,8 @@ proc getHDLfiles {dir} {
   return $filesHDL
 }
 
-proc addHDL {dir} {
+# get all hdl files including vhd-2008/2019 in a directory
+proc addHDLdir {dir} {
   # .v, .sv, .vhd
   set filesHDL  [getHDLfiles $dir]
   foreach x $filesHDL {readHDL  $dir/$x}

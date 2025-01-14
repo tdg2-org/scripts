@@ -12,8 +12,6 @@
 # UG994, UG892
 
 #--------------------------------------------------------------------------------------------------
-# main script 
-#--------------------------------------------------------------------------------------------------
 source tcl/support_procs.tcl
 
 set hdlDir    [lindex $argv 0]
@@ -32,8 +30,8 @@ set_property SOURCE_MGMT_MODE All [current_project]
 
 # add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
 # see tcl/support_procs.tcl 
-addHDL $hdlDir/bd
-addHDL $hdlDir/common
+addHDLdir $hdlDir/bd
+addHDLdir $hdlDir/common
 
 # source BD script
 source $bdDir/$topBDtcl.tcl
