@@ -51,6 +51,11 @@
 
 -proj       : generate BD project only. must be run with -name option.
 
+-full       : generate FULL project with all sources (buildable in GUI). must use with -proj option.
+              for debug or future use cases. will not work with DFX designs - project will be generated 
+              but RMs will need to be manually loaded, and PRs will not be configured in project mode.
+              do NOT use -skipSYN with this option
+
 -name       : name of BD project to be generated, "-name \<project-name>". Independent of BD name 
               and BD tcl script name.
 
@@ -113,6 +118,10 @@
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd  
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd -skipRM  
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2019/led_cnt3_U.vhd  
+
+#### Build full project will all sources, no IP outside of BD
+> tclsh BUILD.tcl -name PRJ2 -noIP -proj -full
+
 
 # DFX
 - Nested-DFX not supported.

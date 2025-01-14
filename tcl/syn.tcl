@@ -16,8 +16,11 @@ set xdcDir    [lindex $argv 5]
 set projName  [lindex $argv 6]
 set RPs       [lindex $argv 7]
 set noIP      [lindex $argv 8]
+set genProj   [lindex $argv 9]
 
 set_part $partNum
+
+if {$genProj} {create_project $projName -part $partNum -in_memory} ;# only for full project generation
 
 #--------------------------------------------------------------------------------------------------
 # read non-BD IP
@@ -73,9 +76,13 @@ if {$projName == "DEFAULT_PROJECT"} {
 read_bd $bdFile
 read_verilog $wrapperFile
 
-#testing
-#save_project_as $projName ../$projName\_FULL -force
-#exit 
+;# only for full project generation (-proj -full)
+if {$genProj} {
+  set_property top $topEntity [current_fileset]
+  set_property source_mgmt_mode All [current_project]
+  save_project_as $projName ../$projName\_FULL -force
+  exit; # done. no synth for this
+} 
 #--------------------------------------------------------------------------------------------------
 # synth 
 #--------------------------------------------------------------------------------------------------
