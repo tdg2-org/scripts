@@ -17,13 +17,12 @@
 ### TEST
 |Input Arg  | Description                                                                           |
 |-----------|---------------------------------------------------------------------------------------|
-|-var       | bla bla bla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla
-              blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla bla|
+|-var       | bla bla bla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla bla|
 |-var2      | bla bla                                                                               |
 
 
 ### Arguments
--clean      : cleans old generated files in scripts folder from previous builds.
+'''-clean      : cleans old generated files in scripts folder from previous builds.'''
 
 -cleanIP    : clean all generated IP products in ip folder.
 
