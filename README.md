@@ -17,10 +17,10 @@
 ### TEST
 |Input Arg  | Description                                                                           |
 |-----------|---------------------------------------------------------------------------------------|
-|-var       | bla bla                                                                               |
-|           | ththt                                                                                 |
-|-var2      | bla bla                                                                               |
-|           | more                                                                                  |
+|-var       | bla bla <br> 
+              ththt |
+|-var2      | bla bla <br>
+              more |
 
 
 ### Arguments
