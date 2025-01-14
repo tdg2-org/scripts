@@ -17,7 +17,7 @@
 ### TEST
 |Input Arg  | Description                                                                           |
 |-----------|---------------------------------------------------------------------------------------|
-|-var       | bla bla                                                                               |
+|-var       | bla bla bla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla bla|
 |-var2      | bla bla                                                                               |
 
 
