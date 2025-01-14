@@ -51,10 +51,7 @@
 
 -RM         : "-RM RM*/<RM_module>.sv" DFX abstract shell partial build for reconfigurable 
               module only. Full build of individual RM up to partial bitstream. Requires 
-              initial full build for static region and abstract shell checkpoint. All HDL 
-              types automated, including vhdl 2008/2019. For vhdl-2008/2019, these files must
-              be in a "2008" or "2019" folder, command example would be: 
-              "-RM RM0/2008/MyModule.vhd".
+              initial full build for static region and abstract shell checkpoint.
 
 -proj       : generate BD project only. must be run with -name option.
 
