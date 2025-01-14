@@ -18,9 +18,9 @@
 |Input Arg  | Description                                                                           |
 |-----------|---------------------------------------------------------------------------------------|
 |-var       | bla bla <br> 
-              ththt |
+              ththt                                                                                 |
 |-var2      | bla bla <br>
-              more |
+              more                                                                                  |
 
 
 ### Arguments
