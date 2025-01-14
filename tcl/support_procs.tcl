@@ -554,3 +554,42 @@ proc cleanIP {} {
     if {$x == "tcl"} {continue} else {file delete -force $ipDir/$x}
   }
 }
+
+#--------------------------------------------------------------------------------------------------
+# Procs for reading HDL
+#--------------------------------------------------------------------------------------------------
+proc readHDL {fname} {
+  set fType [file extension $fname]
+  if {$fType eq ".v" || $fType eq ".sv"} {
+    #puts "VERILOG ADD $fname"
+    read_verilog $fname
+  } elseif {[string match "*2008/*" $fname]} {
+    #puts "VHDL-2008 ADD $fname"
+    read_vhdl -library work -vhdl2008 $fname
+  } elseif {[string match "*2019/*" $fname]} {
+    #puts "VHDL-2019 ADD $fname"
+    read_vhdl -library work -vhdl2019 $fname
+  } else {
+    #puts "VHDL ADD $fname"
+    read_vhdl -library work $fname
+  }
+}
+
+proc getHDLfiles {dir} {
+  set     filesHDL      [glob -nocomplain -tails -directory $dir *.v]
+  append  filesHDL  " " [glob -nocomplain -tails -directory $dir *.sv]
+  append  filesHDL  " " [glob -nocomplain -tails -directory $dir *.vhd]
+  return $filesHDL
+}
+
+proc addHDL {dir} {
+  # .v, .sv, .vhd
+  set filesHDL  [getHDLfiles $dir]
+  foreach x $filesHDL {readHDL  $dir/$x}
+  # vhd-2008
+  set filesHDL  [getHDLfiles $dir/2008]
+  foreach x $filesHDL {readHDL  $dir/2008/$x}
+  # vhd-2019
+  set filesHDL  [getHDLfiles $dir/2019]
+  foreach x $filesHDL {readHDL  $dir/2019/$x}
+}
