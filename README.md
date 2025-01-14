@@ -22,7 +22,8 @@
 
 
 ### Arguments
-```-clean      : cleans old generated files in scripts folder from previous builds.```
+```
+-clean      : cleans old generated files in scripts folder from previous builds.
 
 -cleanIP    : clean all generated IP products in ip folder.
 
@@ -78,7 +79,7 @@
 -cfg        : "-cfg \<cfg-name>". configuration that combines -name, -BDtcl, -out. requires an 
               existing BD tcl script named "top_bd_\<cfg-name>". BD project will be generated
               with name "PRJ_\<cfg-name>". output_products/image folder will be "output_products_\<cfg-name>".
-
+```
 
 ## Examples / Quick copies
 #### Build full design generating new BD project with name PRJ2, and generate IP in the ip folder. This would also build DFX partials if there were any present.
