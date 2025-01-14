@@ -559,20 +559,21 @@ proc cleanIP {} {
 # Procs for reading HDL
 #--------------------------------------------------------------------------------------------------
 # single file read_vhdl or read_verilog
-proc readHDL {fname} {
+proc readHDL {fname {lib "work"}} {
+  set debug 1
   set fType [file extension $fname]
   if {$fType eq ".v" || $fType eq ".sv"} {
-    #puts "VERILOG ADD $fname"
-    read_verilog $fname
+    if {$debug} {puts "VERILOG ADD $fname $lib"}
+    read_verilog -library $lib $fname
   } elseif {[string match "*2008/*" $fname]} {
-    #puts "VHDL-2008 ADD $fname"
-    read_vhdl -library work -vhdl2008 $fname
+    if {$debug} {puts "VHDL-2008 ADD $fname $lib"}
+    read_vhdl -library $lib -vhdl2008 $fname
   } elseif {[string match "*2019/*" $fname]} {
-    #puts "VHDL-2019 ADD $fname"
-    read_vhdl -library work -vhdl2019 $fname
+    if {$debug} {puts "VHDL-2019 ADD $fname $lib"}
+    read_vhdl -library $lib -vhdl2019 $fname
   } else {
-    #puts "VHDL ADD $fname"
-    read_vhdl -library work $fname
+    if {$debug} {puts "VHDL ADD $fname $lib"}
+    read_vhdl -library $lib $fname
   }
 }
 
@@ -585,14 +586,33 @@ proc getHDLfiles {dir} {
 }
 
 # get all hdl files including vhd-2008/2019 in a directory
-proc addHDLdir {dir} {
+#proc addHDLdir {dir} {
+proc addHDLdirFiles {dir {lib "work"}} {
   # .v, .sv, .vhd
   set filesHDL  [getHDLfiles $dir]
-  foreach x $filesHDL {readHDL  $dir/$x}
+  foreach x $filesHDL {readHDL  $dir/$x $lib}
   # vhd-2008
   set filesHDL  [getHDLfiles $dir/2008]
-  foreach x $filesHDL {readHDL  $dir/2008/$x}
+  foreach x $filesHDL {readHDL  $dir/2008/$x $lib}
   # vhd-2019
   set filesHDL  [getHDLfiles $dir/2019]
-  foreach x $filesHDL {readHDL  $dir/2019/$x}
+  foreach x $filesHDL {readHDL  $dir/2019/$x $lib}
+}
+
+proc addHDLdir {dir} {
+  # add hdl with custom library first
+  set libDirs {}
+  foreach folder [glob -nocomplain -directory $dir *] {
+    if {[file isdirectory $folder] && [string match "*/lib_*" $folder]} {
+      lappend libDirs $folder
+    }
+  }
+  
+  foreach libDir $libDirs {
+    set lib [string range [file tail $libDir] 4 end]
+    addHDLdirFiles $libDir $lib
+  }
+  
+  # non-library hdl default 'work'
+  addHDLdirFiles $dir
 }

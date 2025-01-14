@@ -3,13 +3,19 @@
   - Ubuntu 22.04.5 LTS
 
 ### TODO: 
-- -skipIMP and -skipSYN args will not create the output_products folder, need to check if exists first, create only if NOT exist
+- -skipIMP and -skipSYN args will not create the output_products folder, need to check if 
+  exists first, create only if NOT exist
+- need testing HDL libraries  
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
 ### VHDL-2008/2019 now automated. 
-  Non-2008/2019 VHDL files can be in the same directories as verilog/systemverilog. Any VHDL-2008/2019 
-  files must be in 2008 or 2019 folders.
+  Non-2008/2019 VHDL files can be in the same directories as verilog/systemverilog. Any 
+  VHDL-2008/2019 files must be in 2008 or 2019 folders.
+
+### HDL Libraries now automated.
+  Any HDL files required to be compiled/synthesized in custom libraries must be in folders
+  named "lib_<library-name>". (needs testing)
 
 ## script to build : BUILD.tcl
 > tclsh BUILD.tcl
