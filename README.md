@@ -22,7 +22,7 @@
 
 
 ### Arguments
-'''-clean      : cleans old generated files in scripts folder from previous builds.'''
+```-clean      : cleans old generated files in scripts folder from previous builds.```
 
 -cleanIP    : clean all generated IP products in ip folder.
 
