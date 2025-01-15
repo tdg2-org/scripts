@@ -3,41 +3,9 @@
 
 # synth script for non-DFX project, or for static portion of DFX project
 
-#--------------------------------------------------------------------------------------------------
-# procs
-#--------------------------------------------------------------------------------------------------
-
-proc readVerilog {dir} {
-  set     files     [glob -nocomplain -tails -directory $dir *.v]
-  append  files " " [glob -nocomplain -tails -directory $dir *.sv]
-  foreach x $files {
-    read_verilog  $dir/$x
-  }
-}
-
-proc readHDL {fname} {
-  set fType [file extension $fname]
-  if {$fType eq ".v" || $fType eq ".sv"} {
-    read_verilog $fname
-  } elseif {[string match "2008/*" $fname]} {
-    read_vhdl -library work -vhdl2008 $fname
-  } elseif {[string match "2019/*" $fname]} {
-    read_vhdl -library work -vhdl2019 $fname
-  } else {
-    read_vhdl -library work $fname
-  }
-}
-
-proc getHDLfiles {dir} {
-  set     filesHDL      [glob -nocomplain -tails -directory $dir *.v]
-  append  filesHDL  " " [glob -nocomplain -tails -directory $dir *.sv]
-  append  filesHDL  " " [glob -nocomplain -tails -directory $dir *.vhd]
-  return $filesHDL
-}
 
 #--------------------------------------------------------------------------------------------------
-# main script 
-#--------------------------------------------------------------------------------------------------
+source tcl/support_procs.tcl
 
 set hdlDir    [lindex $argv 0]
 set partNum   [lindex $argv 1]
@@ -48,8 +16,11 @@ set xdcDir    [lindex $argv 5]
 set projName  [lindex $argv 6]
 set RPs       [lindex $argv 7]
 set noIP      [lindex $argv 8]
+set genProj   [lindex $argv 9]
 
 set_part $partNum
+
+if {$genProj} {create_project $projName -part $partNum -in_memory} ;# only for full project generation
 
 #--------------------------------------------------------------------------------------------------
 # read non-BD IP
@@ -76,39 +47,16 @@ if {!$noIP} {
 # it will overwrite the black box with the ACTUAL module. Otherwise, if the module is read first, then the top 
 # file where the module (blackbox) is defined, it will overwrite the actual module read first, and make it an 
 # empty black box.
-#read_verilog $hdlDir/top/$topEntity.sv 
-#readVerilog $hdlDir
-#readVerilog $hdlDir/bd 
-#readVerilog $hdlDir/common 
-
 readHDL $hdlDir/top/$topEntity.sv 
 
-set filesHDL  [getHDLfiles $hdlDir]
-foreach x $filesHDL {readHDL  $hdlDir/$x}
+# add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
+# see tcl/support_procs.tcl 
+addHDLdir $hdlDir
+addHDLdir $hdlDir/bd 
+addHDLdir $hdlDir/common 
 
-set filesHDL  [getHDLfiles $hdlDir/bd]
-foreach x $filesHDL {readHDL  $hdlDir/bd/$x}
-
-set filesHDL  [getHDLfiles $hdlDir/common]
-foreach x $filesHDL {readHDL  $hdlDir/common/$x}
-
-set filesHDL  [getHDLfiles $hdlDir/2008]
-foreach x $filesHDL {readHDL  $hdlDir/2008/$x}
-
-set filesHDL  [getHDLfiles $hdlDir/bd/2008]
-foreach x $filesHDL {readHDL  $hdlDir/bd/2008/$x}
-
-set filesHDL  [getHDLfiles $hdlDir/common/2008]
-foreach x $filesHDL {readHDL  $hdlDir/common/2008/$x}
-
-set filesHDL  [getHDLfiles $hdlDir/2019]
-foreach x $filesHDL {readHDL  $hdlDir/2019/$x}
-
-set filesHDL  [getHDLfiles $hdlDir/bd/2019]
-foreach x $filesHDL {readHDL  $hdlDir/bd/2019/$x}
-
-set filesHDL  [getHDLfiles $hdlDir/common/2019]
-foreach x $filesHDL {readHDL  $hdlDir/common/2019/$x}
+# add submodule hdl directories here
+addHDLdir ../sub/crc_gen/hdl
 
 # constraints
 set filesXDC [glob -nocomplain -tails -directory $xdcDir *.xdc]
@@ -131,6 +79,13 @@ if {$projName == "DEFAULT_PROJECT"} {
 read_bd $bdFile
 read_verilog $wrapperFile
 
+;# only for full project generation (-proj -full)
+if {$genProj} {
+  set_property top $topEntity [current_fileset]
+  set_property source_mgmt_mode All [current_project]
+  save_project_as $projName ../$projName\_FULL -force
+  exit; # done. no synth for this
+} 
 #--------------------------------------------------------------------------------------------------
 # synth 
 #--------------------------------------------------------------------------------------------------
