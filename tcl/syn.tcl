@@ -56,7 +56,7 @@ addHDLdir $hdlDir/bd
 addHDLdir $hdlDir/common 
 
 # add submodule hdl directories here
-addHDLdir ../sub/crc_gen/hdl
+#addHDLdir ../sub/crc_gen/hdl
 
 # constraints
 set filesXDC [glob -nocomplain -tails -directory $xdcDir *.xdc]
