@@ -28,6 +28,8 @@ set_part $partNum
 # see tcl/support_procs.tcl 
 addHDLdir $hdlDir/common
 
+# add submodule hdl directories here
+#addHDLdir ../sub/crc_gen/hdl
 
 # DFX partial only
 # RMmodName will contain 2008/2019 folder for vhdl as part of the filename, if it exists

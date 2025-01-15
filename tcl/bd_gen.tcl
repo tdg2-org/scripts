@@ -33,6 +33,9 @@ set_property SOURCE_MGMT_MODE All [current_project]
 addHDLdir $hdlDir/bd
 addHDLdir $hdlDir/common
 
+# add submodule hdl directories here
+addHDLdir ../sub/crc_gen/hdl
+
 # source BD script
 source $bdDir/$topBDtcl.tcl
 
