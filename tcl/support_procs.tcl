@@ -162,7 +162,11 @@ proc buildTimeEnd {} {
     puts "** BUILD COMPLETE ** $buildTimeStamp\_$ghash_msb\n"
   }
   puts "Output products directory : $outputDir"
-  puts "BD project name           : $projName"
+  if {$projName == "DEFAULT_PROJECT"} {
+    puts "BD project name           : in_memory (not saved)"
+  } else {
+    puts "BD project name           : $projName"
+  }
   puts "BD project tcl script     : $topBDtcl.tcl"
   puts "BD name                   : $topBD"
   puts "\nTimestamp: $buildTimeStamp"
@@ -560,7 +564,7 @@ proc cleanIP {} {
 #--------------------------------------------------------------------------------------------------
 # single file read_vhdl or read_verilog
 proc readHDL {fname {lib "work"}} {
-  set debug 1
+  set debug 0
   set fType [file extension $fname]
   if {$fType eq ".v" || $fType eq ".sv"} {
     if {$debug} {puts "VERILOG ADD $fname $lib"}
