@@ -88,7 +88,7 @@ if {!("-skipBD" in $argv) && !$simProj && !$RMabstract} {
 }
 
 # Generate non-BD IP
-if {!("-skipIP" in $argv) && !$noIP && !$bdProjOnly && !$simProj} {
+if {!("-skipIP" in $argv) && !$noIP && !$simProj} {
   vivadoCmd "gen_ip.tcl" $ipDir $partNum "-proj" "-gen"
 }
 
