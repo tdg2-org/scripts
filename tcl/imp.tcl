@@ -142,8 +142,8 @@ if {$DFXrun && $staticDFX} { ;# skip this if empty static not desired for DFX pr
   source ./tcl/load_git_hash.tcl                                                             
   set_property BITSTREAM.CONFIG.USR_ACCESS $buildTime [current_design]                   
   if {![file exists $outputDir/bit]} {file mkdir $outputDir/bit}
-  write_bitstream   -force -no_partial_bitfile $outputDir/bit/static ;# static with empty RPs 
   write_checkpoint  -force $outputDir/dcp/static_route.dcp ;# static with empty RPs 
+  write_bitstream   -force -no_partial_bitfile $outputDir/bit/static ;# static with empty RPs 
   report_timing_summary -file $outputDir/dcp/timing_summary_static_route.rpt
   report_utilization    -file $outputDir/dcp/utilization_static_route.rpt
 } elseif {!$DFXrun} { ;# non-DFX                                                                       
@@ -153,8 +153,8 @@ if {$DFXrun && $staticDFX} { ;# skip this if empty static not desired for DFX pr
   source ./tcl/load_git_hash.tcl                                                             
   set_property BITSTREAM.CONFIG.USR_ACCESS $buildTime [current_design]                   
   if {![file exists $outputDir/bit]} {file mkdir $outputDir/bit}
-  write_bitstream   -force -no_partial_bitfile $outputDir/bit/top                            
   write_checkpoint  -force $outputDir/dcp/top_route.dcp ;# complete checkpoint if non-DFX run 
+  write_bitstream   -force -no_partial_bitfile $outputDir/bit/top                            
   report_timing_summary -file $outputDir/dcp/timing_summary_top_route.rpt
   report_utilization    -file $outputDir/dcp/utilization_top_route.rpt
 }
