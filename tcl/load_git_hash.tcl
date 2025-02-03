@@ -1,4 +1,5 @@
-#
+# check if the githash reg's exist. If not, skip this script
+if {$githash_cells_path == ""} {return}
 
 puts "Retrieving Git Hash..."
 

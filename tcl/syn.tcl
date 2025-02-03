@@ -3,25 +3,24 @@
 
 # synth script for non-DFX project, or for static portion of DFX project
 
-proc readVerilog {dir} {
-  set     files     [glob -nocomplain -tails -directory $dir *.v]
-  append  files " " [glob -nocomplain -tails -directory $dir *.sv]
-  foreach x $files {
-    read_verilog  $dir/$x
-  }
-}
+
+#--------------------------------------------------------------------------------------------------
+source tcl/support_procs.tcl
 
 set hdlDir    [lindex $argv 0]
 set partNum   [lindex $argv 1]
 set topBD     [lindex $argv 2]
 set topEntity [lindex $argv 3]
-set dcpDir    [lindex $argv 4]
+set imageDir  [lindex $argv 4]
 set xdcDir    [lindex $argv 5]
 set projName  [lindex $argv 6]
 set RPs       [lindex $argv 7]
 set noIP      [lindex $argv 8]
+set genProj   [lindex $argv 9]
 
 set_part $partNum
+
+if {$genProj} {create_project $projName -part $partNum -in_memory} ;# only for full project generation
 
 #--------------------------------------------------------------------------------------------------
 # read non-BD IP
@@ -48,12 +47,18 @@ if {!$noIP} {
 # it will overwrite the black box with the ACTUAL module. Otherwise, if the module is read first, then the top 
 # file where the module (blackbox) is defined, it will overwrite the actual module read first, and make it an 
 # empty black box.
-read_verilog $hdlDir/top/$topEntity.sv 
+readHDL $hdlDir/top/$topEntity.sv 
 
-readVerilog $hdlDir
-readVerilog $hdlDir/bd 
-readVerilog $hdlDir/common 
+# add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
+# see tcl/support_procs.tcl 
+addHDLdir $hdlDir
+addHDLdir $hdlDir/bd 
+addHDLdir $hdlDir/common 
 
+# add submodule hdl directories here
+#addHDLdir ../sub/crc_gen/hdl
+
+# constraints
 set filesXDC [glob -nocomplain -tails -directory $xdcDir *.xdc]
 foreach x $filesXDC {
   read_xdc  $xdcDir/$x
@@ -89,11 +94,18 @@ if {$projName == "DEFAULT_PROJECT"} {
 read_bd $bdFile
 read_verilog $wrapperFile
 
+;# only for full project generation (-proj -full)
+if {$genProj} {
+  set_property top $topEntity [current_fileset]
+  set_property source_mgmt_mode All [current_project]
+  save_project_as $projName ../$projName\_FULL -force
+  exit; # done. no synth for this
+} 
 #--------------------------------------------------------------------------------------------------
 # synth 
 #--------------------------------------------------------------------------------------------------
 
 synth_design -top $topEntity -part $partNum
 if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
-write_checkpoint -force $dcpDir/top_synth.dcp
+write_checkpoint -force $imageDir/dcp/top_synth.dcp
 
