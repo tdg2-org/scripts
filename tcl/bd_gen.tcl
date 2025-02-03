@@ -20,6 +20,8 @@ set bdDir     [lindex $argv 2]
 set projName  [lindex $argv 3]
 set topBD     [lindex $argv 4]
 set topBDtcl  [lindex $argv 5]
+set extraBDs  [lindex $argv 6]
+set ipDir     [lindex $argv 7]
 
 set_part $partNum ;# might not need this
 create_project $projName -part $partNum -in_memory
@@ -38,25 +40,25 @@ addHDLdir $hdlDir/common
 
 
 #--------------------------------------------------------------------------------------------------
-# additional BD test  (reg_bd)
+# additional BDs 
 #--------------------------------------------------------------------------------------------------
-source $bdDir/reg_bd.tcl
+foreach extraBDfile $extraBDs {
+  source $bdDir/$extraBDfile.tcl
+  set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+  set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
 
-set bdFile        ".srcs/sources_1/bd/reg_bd/reg_bd.bd"
-set wrapperFile   ".gen/sources_1/bd/reg_bd/hdl/reg_bd\_wrapper.v"
+  make_wrapper -files [get_files $bdFile] -top
+  read_verilog $wrapperFile
+  set_property synth_checkpoint_mode None [get_files $bdFile]
+  generate_target all [get_files $bdFile]
+  set_property top [file rootname [file tail $wrapperFile]] [current_fileset]  
+}
 
-make_wrapper -files [get_files $bdFile] -top
-read_verilog $wrapperFile
-set_property synth_checkpoint_mode None [get_files $bdFile]
-generate_target all [get_files $bdFile]
-set_property top [file rootname [file tail $wrapperFile]] [current_fileset]  
-
-
-
-# source BD script
-source $bdDir/$topBDtcl.tcl
-
-# add XCI files here from IP folder
+#--------------------------------------------------------------------------------------------------
+# add non-bd XCI files here from IP folder, for convenience
+#--------------------------------------------------------------------------------------------------
+set xci_files [glob -nocomplain -directory $ipDir -types f */*.xci]
+foreach xciFile $xci_files {read_ip $xciFile}
 
 #--------------------------------------------------------------------------------------------------
 # TODO: have option to to full in-memory build. Also build with already generated BD project:
@@ -64,6 +66,7 @@ source $bdDir/$topBDtcl.tcl
 # project   : ../$projName/$projName.srcs/...
 #   both need to work during later implementation...
 #--------------------------------------------------------------------------------------------------
+source $bdDir/$topBDtcl.tcl
 set bdFile        ".srcs/sources_1/bd/$topBD/$topBD.bd"
 set wrapperFile   ".gen/sources_1/bd/$topBD/hdl/$topBD\_wrapper.v"
 

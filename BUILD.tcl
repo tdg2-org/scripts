@@ -27,7 +27,8 @@ set simDir      "../hdl/tb"
 set ipDir       "../ip"
 set xdcDir      "../xdc"
 set bdDir       "../bd"
-set topBD       [getBDName]     ;# default = "top_bd"
+set extraBDs    ""              ;# additional BDs other than top. auto-populated, don't touch.
+set topBD       [getBDs]        ;# default = "top_bd"
 set topBDtcl    [getBDtclName]  ;# default = "top_bd" for top_bd.tcl
 set projName    [getProjName]
 set outputDir   [getOutputDir]
@@ -82,14 +83,14 @@ if {"-cleanIP" in $argv} {cleanIP}
 #--------------------------------------------------------------------------------------------------
 # vivado synth/impl commands
 #--------------------------------------------------------------------------------------------------
-# Generate BD
-if {!("-skipBD" in $argv) && !$simProj && !$RMabstract} {
-  vivadoCmd "bd_gen.tcl" $hdlDir $partNum $bdDir $projName $topBD $topBDtcl
-}
-
 # Generate non-BD IP
 if {!("-skipIP" in $argv) && !$noIP && !$simProj} {
   vivadoCmd "gen_ip.tcl" $ipDir $partNum "-proj" "-gen"
+}
+
+# Generate BD
+if {!("-skipBD" in $argv) && !$simProj && !$RMabstract} {
+  vivadoCmd "bd_gen.tcl" $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir
 }
 
 # Synthesize RMs OOC
@@ -100,7 +101,7 @@ if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj && !$ful
 
 # Synthesize full design (static if DFX)
 if {!("-skipSYN" in $argv) && !$bdProjOnly && !$simProj && !$RMabstract} {
-  vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" $noIP $fullProj
+  vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" $noIP $fullProj \"$extraBDs\"
 }
 
 # P&R + bitsream(s)

@@ -84,22 +84,38 @@ proc getBDtclName {} {
 #--------------------------------------------------------------------------------------------------
 # BD name follows directly after '-BDName' input arg
 #--------------------------------------------------------------------------------------------------
-proc getBDName {} {
+proc getBDs {} {
   upvar argv argv
   upvar argc argc
-  set defaultBDName "top_bd"
+  upvar bdDir bdDir
+  upvar extraBDs extraBDs
+  set defaultTopBDName "top_bd"
   if {"-BDName" in $argv} {
     set BDNameIdx [lsearch $argv "-BDName"]
     set BDNameIdx [expr $BDNameIdx + 1]
     if {$BDNameIdx == $argc} {
-      set BDName $defaultBDName
+      set topBDName $defaultTopBDName
     } else {
-      set BDName [lindex $argv $BDNameIdx]
+      set topBDName [lindex $argv $BDNameIdx]
     }
   } else {
-    set BDName $defaultBDName
+    set topBDName $defaultTopBDName
   }
-  return $BDName
+
+  # get all BD tcl files
+  set extraBDs [glob -nocomplain -tails -directory $bdDir *.tcl]
+  # strip tcl extension
+  set extraBDs [lmap file $extraBDs {file rootname $file}]
+  # remove top BD from list
+  set index [lsearch -exact $extraBDs $topBDName]
+  if {$index != -1} { 
+    set extraBDs [lreplace $extraBDs $index $index]
+  } else {
+    puts "ERROR: Top level BD ($topBDName) not found in $bdDir. Quitting."
+    exit
+  }
+  
+  return $topBDName
 }
 
 #--------------------------------------------------------------------------------------------------
