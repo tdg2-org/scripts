@@ -147,3 +147,6 @@
   - All partial bitstreams are generated, in addition to RMs not part of the single full config.
 - Abstract shell checkpoints are generated for all RPs. Build new/modified RMs and partial bitsreams with -RM option.
 - All HDL types including VHDL-2008/2019. Any 2008/2019 files must be in respective 2008/2019 folders.
+
+#### Updates/Changes
+- Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl.

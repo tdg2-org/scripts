@@ -17,6 +17,7 @@ set projName  [lindex $argv 6]
 set RPs       [lindex $argv 7]
 set noIP      [lindex $argv 8]
 set genProj   [lindex $argv 9]
+set extraBDs  [lindex $argv 10]
 
 set_part $partNum
 
@@ -65,7 +66,24 @@ foreach x $filesXDC {
 }
 
 #--------------------------------------------------------------------------------------------------
-# read BD 
+# extra BDs
+#--------------------------------------------------------------------------------------------------
+foreach extraBDfile $extraBDs {
+  # in-memory or saved BD project
+  if {$projName == "DEFAULT_PROJECT"} {
+    set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+    set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+  } else {
+    set bdFile        "../$projName/$projName.srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+    set wrapperFile   "../$projName/$projName.gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+  }
+
+  read_bd $bdFile
+  read_verilog $wrapperFile
+}
+
+#--------------------------------------------------------------------------------------------------
+# TOP BD (primary)
 #--------------------------------------------------------------------------------------------------
 # in-memory or saved BD project
 if {$projName == "DEFAULT_PROJECT"} {
