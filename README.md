@@ -149,4 +149,4 @@
 - All HDL types including VHDL-2008/2019. Any 2008/2019 files must be in respective 2008/2019 folders.
 
 #### Updates/Changes
-- Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl.
+- Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
