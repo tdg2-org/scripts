@@ -163,7 +163,8 @@ if {$DFXrun && $staticDFX} { ;# skip this if empty static not desired for DFX pr
 write_debug_probes  -force $outputDir/ila_probes
 
 # what if RPs include AXI I/Fs? difference between static and configs? Shouldn't be...
-write_hw_platform   -fixed -force $outputDir/platform.xsa
+#write_hw_platform   -fixed -force $outputDir/platform.xsa
+write_hw_platform   -fixed -force $outputDir/platform.xsa -include_bit
 
 
 #--------------------------------------------------------------------------------------------------
