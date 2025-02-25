@@ -67,7 +67,7 @@
               not be run, but syn.tcl is where the full project is populated)
 
 -name       : name of BD project to be generated, "-name <project-name>". Independent of BD 
-              name and BD tcl script name.
+              name and BD tcl script name. prepend names with "PRJ" for git ignore.
 
 -BDtcl      : name of BD tcl script. "-BDtcl <bd-script-name>". Default is "top_bd" if not 
               provided. Generally for debug and future. Script name doesn't need to match BD 
