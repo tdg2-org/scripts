@@ -15,7 +15,7 @@
 
 ### HDL Libraries now automated.
   Any HDL files required to be compiled/synthesized in custom libraries must be in folders
-  named "lib_\<library-name>". (needs testing)
+  named "lib_\<library-name>".
   VHDL-2008/2019 must be in 2008 or 2019 folders under the library folder:
   "hdl/lib_MyLibrary/2008/MyFile.vhd"
 
