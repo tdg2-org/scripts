@@ -57,10 +57,11 @@ set ghash_msb [getGitHash]
 
 if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj TRUE}   else {set fullProj FALSE}
 if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly TRUE} else {set bdProjOnly FALSE}
-if {("-sim" in $argv)}  {set simProj TRUE}    else {set simProj FALSE}
-if {("-RM" in $argv)}   {set RMabstract TRUE} else {set RMabstract FALSE}
+if {("-sim" in $argv)}    {set simProj TRUE}    else {set simProj FALSE}
+if {("-RM" in $argv)}     {set RMabstract TRUE} else {set RMabstract FALSE}
+if {("-ipOnly" in $argv)} {set ipOnly TRUE}     else {set ipOnly FALSE}
 
-if {!$bdProjOnly && !$simProj && !$RMabstract && !$fullProj} { ;# BD project / sim or DFX partial only, skip all this
+if {!$bdProjOnly && !$simProj && !$RMabstract && !$fullProj && !$ipOnly} { ;# BD project / sim or DFX partial only, skip all this
   if {("-forceCleanImg" in $argv)} {
     set imageFolder [outputDirGen]
   } elseif {("-noCleanImg" in $argv) || ("-skipSYN" in $argv) || ("-skipIMP" in $argv) || ("-skipRM" in $argv) || ("-out" in $argv)} {
@@ -89,23 +90,23 @@ if {!("-skipIP" in $argv) && !$noIP && !$simProj} {
 }
 
 # Generate BD
-if {!("-skipBD" in $argv) && !$simProj && !$RMabstract} {
+if {!("-skipBD" in $argv) && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "bd_gen.tcl" $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir
 }
 
 # Synthesize RMs OOC
-if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj} {
+if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
   preSynthRMcheck ;# mostly just pre verification of RPs/RMs from getDFXconfigs. If this doesn't fail, safe to synth RMs.
   vivadoCmd "syn_rm.tcl" $hdlDir $partNum \"$RMs\" $outputDir \"$RPs\" $RPlen $RMmodName $RMfname $RMdir
 }
 
 # Synthesize full design (static if DFX)
-if {!("-skipSYN" in $argv) && !$bdProjOnly && !$simProj && !$RMabstract} {
+if {!("-skipSYN" in $argv) && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" $noIP $fullProj \"$extraBDs\"
 }
 
 # P&R + bitsream(s)
-if {!("-skipIMP" in $argv) && !$bdProjOnly && !$simProj && !$fullProj} {
+if {!("-skipIMP" in $argv) && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
   vivadoCmd "imp.tcl" \"$RMs\" $outputDir \"$RPs\" $RPlen $buildTimeStamp $MaxRMs $RMmodName $RMfname $RMdir
 }
 

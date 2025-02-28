@@ -52,6 +52,8 @@
 
 -noIP       : run as if there are no IP in the IP/tcl folder (even if there are).
 
+-ipOnly     : generate non-BD IP and project only. use with no other args.
+
 -noRM       : run as if there are no RMs in the RM* folders (even if there are).
 
 -RM         : "-RM RM*/<RM_module>.sv" DFX abstract shell partial build for reconfigurable 
@@ -85,6 +87,8 @@
               an existing BD tcl script named "top_bd_<cfg-name>". BD project will be 
               generated with name "PRJ_<cfg-name>". output_products/image folder will be 
               "output_products_<cfg-name>".
+
+-sim        : generate vivado project for simulation only. use with -name.
 ```
 
 ## Examples / Quick copies
@@ -134,6 +138,11 @@
 #### Build full project will all sources, no IP outside of BD
 > tclsh BUILD.tcl -name PRJ2 -noIP -proj -full
 
+#### Generate non-BD IP and project only
+> tclsh BUILD.tcl -ipOnly
+
+#### Generate vivado project only for simulation
+> tclsh BUILD.tcl -sim -name PRJ_sim
 
 # DFX
 - Nested-DFX not supported.
@@ -150,3 +159,7 @@
 
 #### Updates/Changes
 - Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
+- Added -ipOnly arg.
+
+
+

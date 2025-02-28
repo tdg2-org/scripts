@@ -1,25 +1,5 @@
-
-proc readVhdl {dir {lib work} {tb FALSE}} {
-  set     files     [glob -nocomplain -tails -directory $dir *.vhd]
-  foreach x $files {
-    read_vhdl -library $lib  $dir/$x
-    if {$tb} {set_property used_in_synthesis false [get_files $dir/$x]}
-    #read_vhdl ‑vhdl2008 $dir/$x
-    #read_vhdl ‑vhdl2019 $dir/$x    
-  }
-}
-
-proc readVerilog {dir {tb FALSE}} {
-  set     files     [glob -nocomplain -tails -directory $dir *.v]
-  append  files " " [glob -nocomplain -tails -directory $dir *.sv]
-  foreach x $files {
-    read_verilog  $dir/$x
-    if {$tb} {set_property used_in_synthesis false [get_files $dir/$x]}
-  }
-}
 #--------------------------------------------------------------------------------------------------
-# 
-#--------------------------------------------------------------------------------------------------
+source tcl/support_procs.tcl
 
 set hdlDir    [lindex $argv 0]
 set partNum   [lindex $argv 1]
@@ -32,12 +12,21 @@ set_property TARGET_LANGUAGE Verilog [current_project]
 set_property DEFAULT_LIB work [current_project]
 set_property SOURCE_MGMT_MODE All [current_project]
 
-readVerilog $hdlDir/common 
-readVerilog $hdlDir
-readVerilog $simDir TRUE
 
-readVhdl $hdlDir crc_lib
-readVhdl $simDir sim TRUE
+set ipDir "../ip"
+set xciFiles [glob -nocomplain  $ipDir/**/*.xci]
+foreach x $xciFiles {
+  set xciRootName [file rootname [file tail $x]]
+  read_ip $ipDir/$xciRootName/$xciRootName.xci
+  set_property generate_synth_checkpoint false [get_files $ipDir/$xciRootName/$xciRootName.xci]
+  generate_target all [get_files $ipDir/$xciRootName/$xciRootName.xci] 
+}
+
+addHDLdir $hdlDir
+addHDLdir $hdlDir/bd 
+addHDLdir $hdlDir/common 
+addHDLdir $hdlDir/mdl 
+addHDLdir $simDir
 
 
 set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
