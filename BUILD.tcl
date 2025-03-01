@@ -85,7 +85,7 @@ if {"-cleanIP" in $argv} {cleanIP}
 # vivado synth/impl commands
 #--------------------------------------------------------------------------------------------------
 # Generate non-BD IP
-if {!("-skipIP" in $argv) && !$noIP && !$simProj} {
+if {!("-skipIP" in $argv) && !$noIP} {
   vivadoCmd "gen_ip.tcl" $ipDir $partNum "-proj" "-gen"
 }
 
