@@ -36,7 +36,8 @@ addHDLdir $hdlDir/bd
 addHDLdir $hdlDir/common
 
 # add submodule hdl directories here
-#addHDLdir ../sub/crc_gen/hdl
+addHDLdir ../sub/common/hdl
+addHDLdir ../sub/common/hdl/bd
 
 
 #--------------------------------------------------------------------------------------------------
