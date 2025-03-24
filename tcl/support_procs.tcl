@@ -218,9 +218,25 @@ proc getGitHash {} {
     set ghash_msb "GIT_ERROR"
   } else {
     set git_hash  [exec git rev-parse HEAD]
-    set ghash_msb [string range $git_hash 0 7]
+    set ghash_msb [string range $git_hash 0 15]
   }
   return [string toupper $ghash_msb]
+}
+
+#--------------------------------------------------------------------------------------------------
+# Populates the versionInfo list with git hashes
+#--------------------------------------------------------------------------------------------------
+proc updateVersionInfo {} {
+  upvar versionInfo versionInfo
+  set idx 0;
+  foreach vList $versionInfo {
+    set curDir [pwd]
+    cd [lindex $vList 2]
+    set ghash [getGitHash]
+    lset versionInfo $idx [lset vList 0 $ghash]
+    incr idx 
+    cd $curDir
+  }
 }
 
 #--------------------------------------------------------------------------------------------------

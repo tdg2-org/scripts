@@ -7,17 +7,19 @@
 #--------------------------------------------------------------------------------------------------
 source tcl/support_procs.tcl
 
-set hdlDir    [lindex $argv 0]
-set partNum   [lindex $argv 1]
-set topBD     [lindex $argv 2]
-set topEntity [lindex $argv 3]
-set imageDir  [lindex $argv 4]
-set xdcDir    [lindex $argv 5]
-set projName  [lindex $argv 6]
-set RPs       [lindex $argv 7]
-set noIP      [lindex $argv 8]
-set genProj   [lindex $argv 9]
-set extraBDs  [lindex $argv 10]
+set hdlDir      [lindex $argv 0]
+set partNum     [lindex $argv 1]
+set topBD       [lindex $argv 2]
+set topEntity   [lindex $argv 3]
+set imageDir    [lindex $argv 4]
+set xdcDir      [lindex $argv 5]
+set projName    [lindex $argv 6]
+set RPs         [lindex $argv 7]
+set noIP        [lindex $argv 8]
+set genProj     [lindex $argv 9]
+set extraBDs    [lindex $argv 10]
+set timeStamp   [lindex $argv 11]
+set versionInfo [lindex $argv 12]
 
 set_part $partNum
 
@@ -111,5 +113,25 @@ if {$genProj} {
 
 synth_design -top $topEntity -part $partNum
 if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
-write_checkpoint -force $imageDir/dcp/top_synth.dcp
 
+#--------------------------------------------------------------------------------------------------
+# version/timestamp 
+#--------------------------------------------------------------------------------------------------
+foreach verList $versionInfo {
+  set initFF_data  [lindex $verList 0]
+  set initFF_cells_path [get_cells -hierarchical *[lindex $verList 1]*]
+  source ./tcl/initFF64.tcl
+}
+
+set initFF_data $timeStamp
+set initFF_cells_path [get_cells -hierarchical *timestamp_scripts_inst*]
+source ./tcl/initFF32.tcl
+set initFF_cells_path [get_cells -hierarchical *timestamp_top_inst*]
+source ./tcl/initFF32.tcl
+set initFF_cells_path [get_cells -hierarchical *timestamp_common_inst*]
+source ./tcl/initFF32.tcl
+
+#--------------------------------------------------------------------------------------------------
+# done
+#--------------------------------------------------------------------------------------------------
+write_checkpoint -force $imageDir/dcp/top_synth.dcp

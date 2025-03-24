@@ -88,9 +88,9 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
   place_n_route $cfgName
   # this is where updates necessary if other configurations are desired. currently only one (first) config is built
   if {$config == 0} { ;# this is a full config run so need timestamp and githash
-    set githash_cells_path [get_cells -hierarchical *user_init_64b_inst*]                  
-    source ./tcl/load_git_hash.tcl                                                             
-    set_property BITSTREAM.CONFIG.USR_ACCESS $buildTime [current_design]                   
+    #set githash_cells_path [get_cells -hierarchical *user_init_64b_inst*]                  
+    #source ./tcl/load_git_hash.tcl                                                             
+    set_property BITSTREAM.CONFIG.USR_ACCESS $buildTime [current_design]
     write_checkpoint -force $outputDir/dcp/$cfgName.dcp
     
     #loop through and generate abstract shells for each RP
@@ -138,8 +138,8 @@ if {$DFXrun && $staticDFX} { ;# skip this if empty static not desired for DFX pr
     }
   }
   lock_design -level routing                                                        
-  set githash_cells_path [get_cells -hierarchical *user_init_64b_inst*]                  
-  source ./tcl/load_git_hash.tcl                                                             
+  #set githash_cells_path [get_cells -hierarchical *user_init_64b_inst*]                  
+  #source ./tcl/load_git_hash.tcl                                                             
   set_property BITSTREAM.CONFIG.USR_ACCESS $buildTime [current_design]                   
   if {![file exists $outputDir/bit]} {file mkdir $outputDir/bit}
   write_checkpoint  -force $outputDir/dcp/static_route.dcp ;# static with empty RPs 
@@ -149,8 +149,8 @@ if {$DFXrun && $staticDFX} { ;# skip this if empty static not desired for DFX pr
 } elseif {!$DFXrun} { ;# non-DFX                                                                       
   puts "NON-DFX IMPLEMENTATION"
   place_n_route "top"                                                                  
-  set githash_cells_path [get_cells -hierarchical *user_init_64b_inst*]                  
-  source ./tcl/load_git_hash.tcl                                                             
+  #set githash_cells_path [get_cells -hierarchical *user_init_64b_inst*]                  
+  #source ./tcl/load_git_hash.tcl                                                             
   set_property BITSTREAM.CONFIG.USR_ACCESS $buildTime [current_design]                   
   if {![file exists $outputDir/bit]} {file mkdir $outputDir/bit}
   write_checkpoint  -force $outputDir/dcp/top_route.dcp ;# complete checkpoint if non-DFX run 

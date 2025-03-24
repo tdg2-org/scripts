@@ -16,6 +16,12 @@ if {![file exist $VivadoPath]} {
   puts "ERROR - Check Vivado install path.\n\"$VivadoPath\" DOES NOT EXIST"
   exit
 }
+# verify correct dir or quit
+set curDir [pwd]
+if {[file tail $curDir] ne "scripts"} {
+  puts "Script must be sourced from the 'scripts' directory. You are in $curDir. Exiting." 
+  exit
+}
 source tcl/support_procs.tcl
 #--------------------------------------------------------------------------------------------------
 # set some vars for use in other sourced scripts
@@ -54,7 +60,20 @@ set startTime [clock seconds]
 set buildTimeStamp [getTimeStamp $startTime]
 puts "\n*** BUILD TIMESTAMP: $buildTimeStamp ***\n"
 puts "TCL Version : $tcl_version"
+
+cd ../ 
 set ghash_msb [getGitHash]
+cd $curDir
+
+set versionInfo [list \
+  {"" git_hash_top_inst         ../           }\
+  {"" version_bd_inst           ../           }\
+  {"" git_hash_scripts_inst     ./            }\
+  {"" git_hash_common_inst      ../sub/common }
+]
+updateVersionInfo ;# populate git hashes
+#foreach verList $versionInfo { puts $verList}
+#exit
 
 if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj TRUE}   else {set fullProj FALSE}
 if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly TRUE} else {set bdProjOnly FALSE}
@@ -103,7 +122,7 @@ if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj && !$ful
 
 # Synthesize full design (static if DFX)
 if {!("-skipSYN" in $argv) && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
-  vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" $noIP $fullProj \"$extraBDs\"
+  vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\"
 }
 
 # P&R + bitsream(s)
