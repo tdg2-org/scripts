@@ -55,25 +55,29 @@ if {!("-noRM" in $argv)} {getDFXconfigs} ;# Proc to populate DFX vars/lists abov
 # Pre-build stuff
 #--------------------------------------------------------------------------------------------------
 # custom timestamp function instead of xilinx built-in. This ensures timestamp matches exactly
-# across bitstream configs when using PR
+# across bitstream configs and partials when using PR
 set startTime [clock seconds]
 set buildTimeStamp [getTimeStamp $startTime]
 puts "\n*** BUILD TIMESTAMP: $buildTimeStamp ***\n"
-puts "TCL Version : $tcl_version"
+puts "TCL Version : $tcl_version\n"
 
 cd ../ 
 set ghash_msb [getGitHash]
 cd $curDir
 
+# instance names:
+# <name>_git_hash_inst
+# <name>_timestamp_inst
+# leave 1st column empty, it gets populated with git hash
+# 2nd column has <name> which will be appended to as above
+# 3rd column is path to repo/submod (from scripts), to get git hash
 set versionInfo [list \
-  {"" git_hash_top_inst         ../           }\
-  {"" version_bd_inst           ../           }\
-  {"" git_hash_scripts_inst     ./            }\
-  {"" git_hash_common_inst      ../sub/common }
+  {"" top       ../           }\
+  {"" bd        ../           }\
+  {"" scripts   ./            }\
+  {"" common    ../sub/common }
 ]
 updateVersionInfo ;# populate git hashes
-#foreach verList $versionInfo { puts $verList}
-#exit
 
 if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj TRUE}   else {set fullProj FALSE}
 if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly TRUE} else {set bdProjOnly FALSE}

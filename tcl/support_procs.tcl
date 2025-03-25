@@ -240,6 +240,27 @@ proc updateVersionInfo {} {
 }
 
 #--------------------------------------------------------------------------------------------------
+# Populates the instances with git hash & timestamps. used on synthesized design
+# used in syn.tcl, syn_rm.tcl.
+# Requires versionInfo, timeStamp
+#--------------------------------------------------------------------------------------------------
+proc populateVersion {} {
+  upvar versionInfo versionInfo
+  upvar timeStamp timeStamp
+  # if versionInfo is empty, this will be skipped.
+  foreach verList $versionInfo {
+    # git hash
+    set initFF_data  [lindex $verList 0]
+    set initFF_cells_path [get_cells -hierarchical *[lindex $verList 1]_git_hash_inst*] ;# append "_git_hash_inst" for git hash instance
+    if {$initFF_cells_path != ""} {source ./tcl/initFF64.tcl}
+    # timestamp
+    set initFF_data $timeStamp
+    set initFF_cells_path [get_cells -hierarchical *[lindex $verList 1]_timestamp_inst*] ;# append "_timestamp_inst" for timestamp instance
+    if {$initFF_cells_path != ""} {source ./tcl/initFF32.tcl}
+  }
+}
+
+#--------------------------------------------------------------------------------------------------
 # cleans old generated files prior to build if previous failed/exited abnormaly
 #--------------------------------------------------------------------------------------------------
 proc cleanProc {} {
