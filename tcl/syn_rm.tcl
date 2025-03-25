@@ -21,6 +21,8 @@ set RPlen       [lindex $argv 5]
 set RMmodName   [lindex $argv 6]
 set RMfname     [lindex $argv 7]
 set RMdir       [lindex $argv 8]
+set timeStamp   [lindex $argv 9]
+set versionInfo [lindex $argv 10]
 
 set_part $partNum
 
@@ -40,6 +42,7 @@ if {$RMmodName != ""} {
   if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}
   if {[string match "2019/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2019/"]}
   # githash / timestamp TODO
+  # populateVersion ;# git hashes and timestamps - support_procs.tcl  ** NEED TO TEST
     #set initFF_data $timeStamp
     #set initFF_cells_path [get_cells -hierarchical *timestamp_scripts_inst*]
     #source ./tcl/initFF32.tcl
@@ -61,6 +64,7 @@ for {set idx 0} {$idx <$RPlen} {incr idx} {
     if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}
     if {[string match "2019/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2019/"]}
     # githash / timestamp TODO
+    # populateVersion ;# git hashes and timestamps - support_procs.tcl  ** NEED TO TEST
       #set initFF_data $timeStamp
       #set initFF_cells_path [get_cells -hierarchical *timestamp_scripts_inst*]
       #source ./tcl/initFF32.tcl

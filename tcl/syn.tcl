@@ -110,27 +110,7 @@ if {$genProj} {
 #--------------------------------------------------------------------------------------------------
 # synth 
 #--------------------------------------------------------------------------------------------------
-
 synth_design -top $topEntity -part $partNum
 if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
-populateVersion
-#--------------------------------------------------------------------------------------------------
-# version/timestamp 
-# **TODO: move this to a proc that can be use here and syn_rm.
-#--------------------------------------------------------------------------------------------------
-## if versionInfo is empty, this will be skipped.
-#foreach verList $versionInfo {
-#  # git hash
-#  set initFF_data  [lindex $verList 0]
-#  set initFF_cells_path [get_cells -hierarchical *[lindex $verList 1]_git_hash_inst*] ;# append "_git_hash_inst" for git hash instance
-#  if {$initFF_cells_path != ""} {source ./tcl/initFF64.tcl}
-#  # timestamp
-#  set initFF_data $timeStamp
-#  set initFF_cells_path [get_cells -hierarchical *[lindex $verList 1]_timestamp_inst*] ;# append "_timestamp_inst" for timestamp instance
-#  if {$initFF_cells_path != ""} {source ./tcl/initFF32.tcl}
-#}
-
-#--------------------------------------------------------------------------------------------------
-# done
-#--------------------------------------------------------------------------------------------------
+populateVersion ;# git hashes and timestamps - support_procs.tcl
 write_checkpoint -force $imageDir/dcp/top_synth.dcp
