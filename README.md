@@ -32,7 +32,7 @@
   the design must be "\<name>_git_hash_inst" and "\<name>_timestamp_inst". If these modules are in 
   separate repos (submodules), the variable contains a column for path to the repo, so the git 
   hash is parsed and populated appropriately.
-  Example is for top, bd, scripts, common, other_submodules, etc. 
+  Example is for top, bd, scripts, common, other_submodules, etc.  
   My vision: Testing designs on an eval kit, before custom hardware. This would necessitate:
     - two versions of top (IO will differ)
     - two versions of BD (PS config and MIO will differ)
