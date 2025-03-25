@@ -1,3 +1,6 @@
+## script to build : BUILD.tcl
+> tclsh BUILD.tcl <args>
+
 #### Current tool/OS versions:
   - Vivado/Vitis 2023.2
   - Ubuntu 22.04.5 LTS
@@ -22,8 +25,23 @@
 ### Adding submodules
   update bd_gen.tcl, syn.tcl, syn_rm.tcl (if DFX) 
 
-## script to build : BUILD.tcl
-> tclsh BUILD.tcl
+### Versioning
+  Populating git hashes and timestamps is automated. In BUILD.tcl, variable "versionInfo" is 
+  manually updated by user per design with instance <name> of each git hash and timestamp 
+  module (user_init_64b,user_init_32b in the common submodule). See BUILD.tcl for example, <name>
+  entered by user will be appended with "git_hash_inst" or "timestamp_inst", so instantiation in
+  the design must be "<name>_git_hash_inst" and "<name>_timestamp_inst". If these modules are in 
+  separate repos (submodules), the variable contains a column for path to the repo, so the git 
+  hash is parsed and populated appropriately.
+  Example is for top, bd, scripts, common, other_submodules, etc. 
+  My vision: Testing designs on an eval kit, before custom hardware. This would necessitate:
+    - two versions of top (IO will differ)
+    - two versions of BD (PS config and MIO will differ)
+    - scripts and all other reuse submodules will have identifiable versioning.
+  * versioning modules not required, if they don't exist versioning is ignored
+  * equal number of git hash and timestamp modules are not required. any number of each is permitted
+  * standard zynq+ USR_ACCESS is configured at P&R time, separate/independent from this versioning
+    automation. see imp.tcl for the USR_ACCESS config 
 
 ### Arguments
 ```
@@ -160,6 +178,6 @@
 #### Updates/Changes
 - Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
 - Added -ipOnly arg.
-
+- Added automation for versioning modules (git hash / timestamp).
 
 
