@@ -33,10 +33,10 @@
   separate repos (submodules), the variable contains a column for path to the repo, so the git 
   hash is parsed and populated appropriately.
   Example is for top, bd, scripts, common, other_submodules, etc.  
-  My vision: Testing designs on an eval kit, before custom hardware. This would necessitate:
-    - two versions of top (IO will differ)
-    - two versions of BD (PS config and MIO will differ)
-    - scripts and all other reuse submodules will have identifiable versioning.
+  My vision: Testing designs on an eval kit, before custom hardware. This would necessitate:  
+    - two versions of top (IO will differ)  
+    - two versions of BD (PS config and MIO will differ)  
+    - scripts and all other reuse submodules will have identifiable versioning.  
   * versioning modules not required, if they don't exist versioning is ignored
   * equal number of git hash and timestamp modules are not required. any number of each is permitted
   * standard zynq+ USR_ACCESS is configured at P&R time, separate/independent from this versioning
