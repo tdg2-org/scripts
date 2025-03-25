@@ -28,7 +28,7 @@
   Populating git hashes and timestamps is automated. In BUILD.tcl, variable "versionInfo" is 
   manually updated by user per design with instance \<name> of each git hash and timestamp 
   module (user_init_64b,user_init_32b in the "common" submodule). See BUILD.tcl for example, \<name>
-  entered by user will be appended with "git_hash_inst" or "timestamp_inst", so instantiation in
+  entered by user will be appended with "_git_hash_inst" or "_timestamp_inst", so instantiation in
   the design must be "\<name>_git_hash_inst" and "\<name>_timestamp_inst". If these modules are in 
   separate repos (submodules), the variable contains a column for path to the repo, so the git 
   hash is parsed and populated appropriately.
