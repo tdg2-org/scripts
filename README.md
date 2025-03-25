@@ -67,11 +67,13 @@
 -skipIMP    : skip implementation and bitstream gen, generally for debug, or just desire other
               steps output products.
 
--noIP       : run as if there are no IP in the IP/tcl folder (even if there are).
+-noIP       : run as if there are no IP in the IP/tcl folder (even if there are).  
+              * change this to ignoreIP
 
 -ipOnly     : generate non-BD IP and project only. use with no other args.
 
--noRM       : run as if there are no RMs in the RM* folders (even if there are).
+-noRM       : run as if there are no RMs in the RM* folders (even if there are).  
+              * change this to ignoreRM
 
 -RM         : "-RM RM*/<RM_module>.sv" DFX abstract shell partial build for reconfigurable 
               module only. Full build of individual RM up to partial bitstream. Requires 
