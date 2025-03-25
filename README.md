@@ -37,10 +37,10 @@
     - two versions of top (IO will differ)  
     - two versions of BD (PS config and MIO will differ)  
     - scripts and all other reuse submodules will have identifiable versioning.  
-  * versioning modules not required, if they don't exist versioning is ignored
+  * versioning modules not required, if they don't exist versioning is ignored without error
   * equal number of git hash and timestamp modules are not required. any number of each is permitted
-  * standard zynq+ USR_ACCESS is configured at P&R time, separate/independent from this versioning
-    automation. see imp.tcl for the USR_ACCESS config 
+  * standard zynq+ USR_ACCESS is configured at P&R time with build timestamp, separate/independent 
+    from this versioning automation. see imp.tcl for the USR_ACCESS config 
 
 ### Arguments
 ```
