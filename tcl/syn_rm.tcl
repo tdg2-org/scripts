@@ -41,12 +41,7 @@ if {$RMmodName != ""} {
   set fileRootName [file rootname $RMfname]
   if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}
   if {[string match "2019/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2019/"]}
-  # githash / timestamp TODO
   populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
-  # populateVersion ;# git hashes and timestamps - support_procs.tcl  ** NEED TO TEST
-    #set initFF_data $timeStamp
-    #set initFF_cells_path [get_cells -hierarchical *timestamp_scripts_inst*]
-    #source ./tcl/initFF32.tcl
   write_checkpoint -force $outputDir/dcp/$RMdir/$RMdir\_post_synth_$fileRootName.dcp
   return ;# done, return from this script
 }
@@ -64,12 +59,7 @@ for {set idx 0} {$idx <$RPlen} {incr idx} {
     set fileRootName [file rootname $x]
     if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}
     if {[string match "2019/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2019/"]}
-    # githash / timestamp TODO
     populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
-    # populateVersion ;# git hashes and timestamps - support_procs.tcl  ** NEED TO TEST
-      #set initFF_data $timeStamp
-      #set initFF_cells_path [get_cells -hierarchical *timestamp_scripts_inst*]
-      #source ./tcl/initFF32.tcl
     write_checkpoint -force $outputDir/dcp/$curRPdir/$curRPdir\_post_synth_$fileRootName.dcp
   }
 }
