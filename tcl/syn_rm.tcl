@@ -42,6 +42,7 @@ if {$RMmodName != ""} {
   if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}
   if {[string match "2019/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2019/"]}
   # githash / timestamp TODO
+  populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
   # populateVersion ;# git hashes and timestamps - support_procs.tcl  ** NEED TO TEST
     #set initFF_data $timeStamp
     #set initFF_cells_path [get_cells -hierarchical *timestamp_scripts_inst*]
@@ -64,6 +65,7 @@ for {set idx 0} {$idx <$RPlen} {incr idx} {
     if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}
     if {[string match "2019/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2019/"]}
     # githash / timestamp TODO
+    populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
     # populateVersion ;# git hashes and timestamps - support_procs.tcl  ** NEED TO TEST
       #set initFF_data $timeStamp
       #set initFF_cells_path [get_cells -hierarchical *timestamp_scripts_inst*]

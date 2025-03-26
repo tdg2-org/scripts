@@ -15,4 +15,4 @@ for {set i 0} {$i < 32} {incr i} {
   set initFF_msb [expr $initFF_msb >> 1]
 }
 
-puts "*** Initialized $initFF_cells_path to $initFF_msb ***\n"
+puts "*** Initialized $initFF_cells_path to [string range $initFF_data 0 7] ***\n"

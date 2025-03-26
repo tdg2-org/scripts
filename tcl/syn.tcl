@@ -112,5 +112,6 @@ if {$genProj} {
 #--------------------------------------------------------------------------------------------------
 synth_design -top $topEntity -part $partNum
 if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
-populateVersion ;# git hashes and timestamps - support_procs.tcl
+populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
 write_checkpoint -force $imageDir/dcp/top_synth.dcp
+

@@ -27,8 +27,8 @@ source tcl/support_procs.tcl
 # set some vars for use in other sourced scripts
 #--------------------------------------------------------------------------------------------------
 set TOP_ENTITY  "top_io" ;# top entity name or image/bit file generated name...
-#set partNum     "xczu3eg-sbva484-1-i" ;# U96v2
-set partNum     "xczu1cg-sbva484-1-e" ;# ZUBoard
+set partNum     "xczu3eg-sbva484-1-i" ;# U96v2
+#set partNum     "xczu1cg-sbva484-1-e" ;# ZUBoard
 set hdlDir      "../hdl"
 set simDir      "../hdl/tb"
 set ipDir       "../ip"
@@ -74,8 +74,9 @@ cd $curDir
 set versionInfo [list \
   {"" top       ../           }\
   {"" bd        ../           }\
-  {"" scripts   ./            }\
-  {"" common    ../sub/common }
+  {"" led       ./            }\
+  {"" scripts   ./            }
+#  {"" common    ../sub/common }
 ]
 updateVersionInfo ;# populate git hashes
 
