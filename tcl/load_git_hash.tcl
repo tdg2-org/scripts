@@ -1,31 +1,12 @@
-# check if the githash reg's exist. If not, skip this script
-if {$githash_cells_path == ""} {return}
+#
 
-puts "Retrieving Git Hash..."
-
-if {[catch {exec git rev-parse HEAD}]} {
-  puts "GIT ERROR\n"
-  set git_hash "a5a5deadf7f7beef0012003400560078009a00bc"
-  puts "Dummy git hash: $git_hash"
-
-  set ghash_msb [string range $git_hash 0 7]
-  set ghash_lsb [string range $git_hash 8 15]
-
-  puts "Partial dummy git hash to load: $ghash_msb$ghash_lsb"
-
-  #scan %x: read hex val, set as int
-  set ghash_msb [scan $ghash_msb %x]
-  set ghash_lsb [scan $ghash_lsb %x]
-} else {
-  set git_hash [exec git rev-parse HEAD]
-  puts "Retrieved git hash: $git_hash"
-  set ghash_msb [string range $git_hash 0 7]
-  set ghash_lsb [string range $git_hash 8 15]
-  puts "Partial git hash to load: $ghash_msb$ghash_lsb"
-  #scan %x: read hex val, set as int
-  set ghash_msb [scan $ghash_msb %x]
-  set ghash_lsb [scan $ghash_lsb %x]
-}
+puts "Retrieved git hash: $git_hash_load"
+set ghash_msb [string range $git_hash_load 0 7]
+set ghash_lsb [string range $git_hash_load 8 15]
+puts "Partial git hash to load: $ghash_msb$ghash_lsb"
+#scan %x: read hex val, set as int
+set ghash_msb [scan $ghash_msb %x]
+set ghash_lsb [scan $ghash_lsb %x]
 
 # set/init each flop
 for {set i 0} {$i < 32} {incr i} {

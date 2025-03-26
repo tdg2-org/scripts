@@ -21,6 +21,8 @@ set RPlen       [lindex $argv 5]
 set RMmodName   [lindex $argv 6]
 set RMfname     [lindex $argv 7]
 set RMdir       [lindex $argv 8]
+set timeStamp   [lindex $argv 9]
+set versionInfo [lindex $argv 10]
 
 set_part $partNum
 
@@ -39,6 +41,7 @@ if {$RMmodName != ""} {
   set fileRootName [file rootname $RMfname]
   if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}
   if {[string match "2019/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2019/"]}
+  populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
   write_checkpoint -force $outputDir/dcp/$RMdir/$RMdir\_post_synth_$fileRootName.dcp
   return ;# done, return from this script
 }
@@ -56,6 +59,7 @@ for {set idx 0} {$idx <$RPlen} {incr idx} {
     set fileRootName [file rootname $x]
     if {[string match "2008/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2008/"]}
     if {[string match "2019/*" $fileRootName]} {set fileRootName [string trimleft $fileRootName "2019/"]}
+    populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
     write_checkpoint -force $outputDir/dcp/$curRPdir/$curRPdir\_post_synth_$fileRootName.dcp
   }
 }

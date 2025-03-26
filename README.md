@@ -1,3 +1,6 @@
+## script to build : BUILD.tcl
+> tclsh BUILD.tcl <args>
+
 #### Current tool/OS versions:
   - Vivado/Vitis 2023.2
   - Ubuntu 22.04.5 LTS
@@ -5,7 +8,6 @@
 ### TODO: 
 - -skipIMP and -skipSYN args will not create the output_products folder, need to check if 
   exists first, create only if NOT exist
-- need testing HDL libraries  
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
@@ -22,8 +24,23 @@
 ### Adding submodules
   update bd_gen.tcl, syn.tcl, syn_rm.tcl (if DFX) 
 
-## script to build : BUILD.tcl
-> tclsh BUILD.tcl
+### Versioning
+  Populating git hashes and timestamps is automated. In BUILD.tcl, variable "versionInfo" is 
+  manually updated by user per design with instance \<name> of each git hash and timestamp 
+  module (user_init_64b,user_init_32b in the "common" submodule). See BUILD.tcl for example, \<name>
+  entered by user will be appended with "_git_hash_inst" or "_timestamp_inst", so instantiation in
+  the design must be "\<name>_git_hash_inst" and "\<name>_timestamp_inst". If these modules are in 
+  separate repos (submodules), the variable contains a column for path to the repo, so the git 
+  hash is parsed and populated appropriately.
+  Example is for top, bd, scripts, common, other_submodules, etc.  
+  My vision: Testing designs on an eval kit, before custom hardware. This would necessitate:  
+    - two versions of top (IO will differ)  
+    - two versions of BD (PS config and MIO will differ)  
+    - scripts and all other reuse submodules will have identifiable versioning.  
+  * versioning modules not required, if they don't exist versioning is ignored without error
+  * equal number of git hash and timestamp modules are not required. any number of each is permitted
+  * standard zynq+ USR_ACCESS is configured at P&R time with build timestamp, separate/independent 
+    from this versioning automation. see imp.tcl for the USR_ACCESS config 
 
 ### Arguments
 ```
@@ -50,11 +67,13 @@
 -skipIMP    : skip implementation and bitstream gen, generally for debug, or just desire other
               steps output products.
 
--noIP       : run as if there are no IP in the IP/tcl folder (even if there are).
+-noIP       : run as if there are no IP in the IP/tcl folder (even if there are).  
+              * change this to ignoreIP
 
 -ipOnly     : generate non-BD IP and project only. use with no other args.
 
--noRM       : run as if there are no RMs in the RM* folders (even if there are).
+-noRM       : run as if there are no RMs in the RM* folders (even if there are).  
+              * change this to ignoreRM
 
 -RM         : "-RM RM*/<RM_module>.sv" DFX abstract shell partial build for reconfigurable 
               module only. Full build of individual RM up to partial bitstream. Requires 
@@ -134,6 +153,7 @@
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd  
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd -skipRM  
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2019/led_cnt3_U.vhd  
+> tclsh BUILD.tcl -name PRJ0 -skipIP -skipBD -RM RM2/led_cnt3_vers.sv  
 
 #### Build full project will all sources, no IP outside of BD
 > tclsh BUILD.tcl -name PRJ2 -noIP -proj -full
@@ -160,6 +180,6 @@
 #### Updates/Changes
 - Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
 - Added -ipOnly arg.
-
+- Added automation for versioning modules (git hash / timestamp).
 
 

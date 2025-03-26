@@ -218,9 +218,46 @@ proc getGitHash {} {
     set ghash_msb "GIT_ERROR"
   } else {
     set git_hash  [exec git rev-parse HEAD]
-    set ghash_msb [string range $git_hash 0 7]
+    set ghash_msb [string range $git_hash 0 15]
   }
   return [string toupper $ghash_msb]
+}
+
+#--------------------------------------------------------------------------------------------------
+# Populates the versionInfo list with git hashes
+#--------------------------------------------------------------------------------------------------
+proc updateVersionInfo {} {
+  upvar versionInfo versionInfo
+  set idx 0;
+  foreach vList $versionInfo {
+    set curDir [pwd]
+    cd [lindex $vList 2]
+    set ghash [getGitHash]
+    lset versionInfo $idx [lset vList 0 $ghash]
+    incr idx 
+    cd $curDir
+  }
+}
+
+#--------------------------------------------------------------------------------------------------
+# Populates the instances with git hash & timestamps. used on synthesized design
+# used in syn.tcl, syn_rm.tcl.
+# Requires versionInfo, timeStamp
+#--------------------------------------------------------------------------------------------------
+proc populateVersion {} {
+  upvar versionInfo versionInfo
+  upvar timeStamp timeStamp
+  # if versionInfo is empty, this will be skipped.
+  foreach verList $versionInfo {
+    # git hash
+    set initFF_data  [lindex $verList 0]
+    set initFF_cells_path [get_cells -hierarchical *[lindex $verList 1]_git_hash_inst*] ;# append "_git_hash_inst" for git hash instance
+    if {$initFF_cells_path != ""} {source ./tcl/initFF64.tcl}
+    # timestamp
+    set initFF_data $timeStamp
+    set initFF_cells_path [get_cells -hierarchical *[lindex $verList 1]_timestamp_inst*] ;# append "_timestamp_inst" for timestamp instance
+    if {$initFF_cells_path != ""} {source ./tcl/initFF32.tcl}
+  }
 }
 
 #--------------------------------------------------------------------------------------------------

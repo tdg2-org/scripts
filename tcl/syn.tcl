@@ -7,17 +7,19 @@
 #--------------------------------------------------------------------------------------------------
 source tcl/support_procs.tcl
 
-set hdlDir    [lindex $argv 0]
-set partNum   [lindex $argv 1]
-set topBD     [lindex $argv 2]
-set topEntity [lindex $argv 3]
-set imageDir  [lindex $argv 4]
-set xdcDir    [lindex $argv 5]
-set projName  [lindex $argv 6]
-set RPs       [lindex $argv 7]
-set noIP      [lindex $argv 8]
-set genProj   [lindex $argv 9]
-set extraBDs  [lindex $argv 10]
+set hdlDir      [lindex $argv 0]
+set partNum     [lindex $argv 1]
+set topBD       [lindex $argv 2]
+set topEntity   [lindex $argv 3]
+set imageDir    [lindex $argv 4]
+set xdcDir      [lindex $argv 5]
+set projName    [lindex $argv 6]
+set RPs         [lindex $argv 7]
+set noIP        [lindex $argv 8]
+set genProj     [lindex $argv 9]
+set extraBDs    [lindex $argv 10]
+set timeStamp   [lindex $argv 11]
+set versionInfo [lindex $argv 12]
 
 set_part $partNum
 
@@ -57,7 +59,8 @@ addHDLdir $hdlDir/bd
 addHDLdir $hdlDir/common 
 
 # add submodule hdl directories here
-#addHDLdir ../sub/crc_gen/hdl
+addHDLdir ../sub/common/hdl
+addHDLdir ../sub/common/hdl/bd
 
 # constraints
 set filesXDC [glob -nocomplain -tails -directory $xdcDir *.xdc]
@@ -107,8 +110,8 @@ if {$genProj} {
 #--------------------------------------------------------------------------------------------------
 # synth 
 #--------------------------------------------------------------------------------------------------
-
 synth_design -top $topEntity -part $partNum
 if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
+populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
 write_checkpoint -force $imageDir/dcp/top_synth.dcp
 
