@@ -164,6 +164,10 @@
 #### Generate vivado project only for simulation
 > tclsh BUILD.tcl -sim -name PRJ_sim
 
+#### Misc.
+> cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD  
+> cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/led_cnt3_vers.sv  
+
 # DFX
 - Nested-DFX not supported.
 - RMs must be in folders named RM* in hdl directory.
