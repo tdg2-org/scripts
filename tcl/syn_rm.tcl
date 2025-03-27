@@ -28,10 +28,11 @@ set_part $partNum
 
 # add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
 # see tcl/support_procs.tcl 
-addHDLdir $hdlDir/common
+#addHDLdir $hdlDir/common
 
 # add submodule hdl directories here
 #addHDLdir ../sub/crc_gen/hdl
+addHDLdir ../sub/common/hdl
 
 # DFX partial only
 # RMmodName will contain 2008/2019 folder for vhdl as part of the filename, if it exists
