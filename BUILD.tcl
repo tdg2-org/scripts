@@ -80,11 +80,13 @@ set versionInfo [list \
 ]
 updateVersionInfo ;# populate git hashes
 
+# TODO: move all this into a proc...
 if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj TRUE}   else {set fullProj FALSE}
 if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly TRUE} else {set bdProjOnly FALSE}
 if {("-sim" in $argv)}    {set simProj TRUE}    else {set simProj FALSE}
 if {("-RM" in $argv)}     {set RMabstract TRUE} else {set RMabstract FALSE}
 if {("-ipOnly" in $argv)} {set ipOnly TRUE}     else {set ipOnly FALSE}
+if {("-multBD" in $argv)} {set multipleBDs TRUE} else {set multipleBDs FALSE}
 
 # if BD project / sim or DFX partial only, skip all this
 if {!$bdProjOnly && !$simProj && !$RMabstract && !$fullProj && !$ipOnly} {
@@ -118,7 +120,8 @@ if {!("-skipIP" in $argv) && !$noIP} {
 
 # Generate BD
 if {!("-skipBD" in $argv) && !$simProj && !$RMabstract && !$ipOnly} {
-  vivadoCmd "bd_gen.tcl" $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir
+  vivadoCmd "bd_gen.tcl"  $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir \
+                          $multipleBDs
 }
 
 # Synthesize RMs OOC
@@ -131,7 +134,7 @@ if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj && !$ful
 # Synthesize full design (static if DFX)
 if {!("-skipSYN" in $argv) && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" \
-                      $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\"
+                      $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\" $multipleBDs
 }
 
 # P&R + bitsream(s)

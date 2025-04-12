@@ -97,6 +97,13 @@
 -BDName     : name of BD within tcl script. "-BDname <bd-name>". Default is "top_bd" if not 
               provided.
 
+-multBD     : this needs to be added if there are multiple BDs in the design. temporary fix
+              for using the above -BDtcl,-BDName args, which implies multiple BD tcl files
+              in the BD folder. adding -multBD arg assumes every tcl file in the BD folder
+              will be processes and used in the design. without -multBD (default), only 
+              a single BD will be used, "top_bd" as default, or BD that is given using the
+              -BDtcl and/or -BDName args.
+
 -verbose    : print script tcl for debug. prevent usage of -notrace for vivado commands.
 
 -out        : "-out <output_products-directory-name>". Custom name of directory location for 

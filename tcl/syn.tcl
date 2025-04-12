@@ -20,6 +20,7 @@ set genProj     [lindex $argv 9]
 set extraBDs    [lindex $argv 10]
 set timeStamp   [lindex $argv 11]
 set versionInfo [lindex $argv 12]
+set multipleBDs [lindex $argv 13]
 
 set_part $partNum
 
@@ -71,20 +72,21 @@ foreach x $filesXDC {
 #--------------------------------------------------------------------------------------------------
 # extra BDs
 #--------------------------------------------------------------------------------------------------
-foreach extraBDfile $extraBDs {
-  # in-memory or saved BD project
-  if {$projName == "DEFAULT_PROJECT"} {
-    set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
-    set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
-  } else {
-    set bdFile        "../$projName/$projName.srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
-    set wrapperFile   "../$projName/$projName.gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+if {$multipleBDs} {
+  foreach extraBDfile $extraBDs {
+    # in-memory or saved BD project
+    if {$projName == "DEFAULT_PROJECT"} {
+      set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+      set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+    } else {
+      set bdFile        "../$projName/$projName.srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+      set wrapperFile   "../$projName/$projName.gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+    }
+
+    read_bd $bdFile
+    read_verilog $wrapperFile
   }
-
-  read_bd $bdFile
-  read_verilog $wrapperFile
 }
-
 #--------------------------------------------------------------------------------------------------
 # TOP BD (primary)
 #--------------------------------------------------------------------------------------------------
