@@ -8,6 +8,7 @@
 ### TODO: 
 - -skipIMP and -skipSYN args will not create the output_products folder, need to check if 
   exists first, create only if NOT exist
+- A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
@@ -187,6 +188,14 @@
   - All partial bitstreams are generated, in addition to RMs not part of the single full config.
 - Abstract shell checkpoints are generated for all RPs. Build new/modified RMs and partial bitsreams with -RM option.
 - All HDL types including VHDL-2008/2019. Any 2008/2019 files must be in respective 2008/2019 folders.
+- Steps to configure:
+  1. Build first as non-DFX full design with RMs in hdl directory (NOT RM folders).
+  2. Floorplan RMs and save constraints.
+  3. Move RMs to RM folders.
+  4. Include blackbox module declarations with RM instantiations, for building static.
+  5. Build. First will be static + partials. After this, partials can be built independently.
+**TODO: A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
+
 
 #### Updates/Changes
 - Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
