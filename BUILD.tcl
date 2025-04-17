@@ -128,7 +128,7 @@ if {!("-skipBD" in $argv) && !$simProj && !$RMabstract && !$ipOnly} {
 if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
   preSynthRMcheck ;#pre verify RPs/RMs from getDFXconfigs. If this doesn't fail, safe to synth RMs.
   vivadoCmd "syn_rm.tcl"  $hdlDir $partNum \"$RMs\" $outputDir \"$RPs\" $RPlen $RMmodName $RMfname \
-                          $RMdir $buildTimeStamp \"$versionInfo\"
+                          $RMdir $buildTimeStamp \"$versionInfo\" $noIP
 }
 
 # Synthesize full design (static if DFX)

@@ -23,6 +23,7 @@ set RMfname     [lindex $argv 7]
 set RMdir       [lindex $argv 8]
 set timeStamp   [lindex $argv 9]
 set versionInfo [lindex $argv 10]
+set noIP        [lindex $argv 11]
 
 set_part $partNum
 
@@ -34,8 +35,26 @@ set_part $partNum
 #addHDLdir ../sub/crc_gen/hdl
 addHDLdir ../sub/common/hdl
 
+#--------------------------------------------------------------------------------------------------
+# read non-BD IP
+#--------------------------------------------------------------------------------------------------
+# IP must be in ../ip/<ipName>/<ipName>.xci
+# IP already generated in the gen_ip.tcl script
+if {!$noIP} {
+  set ipDir "../ip"
+  set xciFiles [glob -nocomplain  $ipDir/**/*.xci]
+  foreach x $xciFiles {
+    set xciRootName [file rootname [file tail $x]]
+    read_ip $ipDir/$xciRootName/$xciRootName.xci
+    set_property generate_synth_checkpoint false [get_files $ipDir/$xciRootName/$xciRootName.xci]
+    generate_target all [get_files $ipDir/$xciRootName/$xciRootName.xci] 
+  }
+}
+
+#--------------------------------------------------------------------------------------------------
 # DFX partial only
 # RMmodName will contain 2008/2019 folder for vhdl as part of the filename, if it exists
+#--------------------------------------------------------------------------------------------------
 if {$RMmodName != ""} {
   readHDL $hdlDir/$RMdir/$RMfname ;# single file only
   synth_design -mode out_of_context -top $RMmodName -part $partNum
@@ -47,8 +66,10 @@ if {$RMmodName != ""} {
   return ;# done, return from this script
 }
 
+#--------------------------------------------------------------------------------------------------
 # RMs will contain 2008/2019 folder for vhdl as part of the filename, if it exists
 # loop through every RM per RP, and synthesize all
+#--------------------------------------------------------------------------------------------------
 for {set idx 0} {$idx <$RPlen} {incr idx} {
   set curRPdir  [lindex $RPs [expr 2*$idx]]
   set curRPmod  [lindex $RPs [expr 2*$idx + 1]]

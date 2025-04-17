@@ -162,6 +162,7 @@
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd -skipRM  
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2019/led_cnt3_U.vhd  
 > tclsh BUILD.tcl -name PRJ0 -skipIP -skipBD -RM RM2/led_cnt3_vers.sv  
+> tclsh BUILD.tcl -name PRJ2 -skipIP -skipBD -RM RM0/i2c_top.sv -clean  
 
 #### Build full project will all sources, no IP outside of BD
 > tclsh BUILD.tcl -name PRJ2 -noIP -proj -full
