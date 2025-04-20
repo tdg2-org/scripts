@@ -165,6 +165,7 @@
 > tclsh BUILD.tcl -name PRJ2 -skipIP -skipBD -RM RM0/i2c_top.sv -clean  
 > tclsh BUILD.tcl -name PRJ0 -skipIP -skipBD -RM RM0/i2c_top.sv -clean  
 > tclsh BUILD.tcl -name PRJ0 -clean -skipBD -RM RM0/i2c_top.sv  
+> tclsh BUILD.tcl -name PRJ0 -clean -skipBD -skipIP -RM RM0/i2c_top.sv
 
 #### Build full project will all sources, no IP outside of BD
 > tclsh BUILD.tcl -name PRJ2 -noIP -proj -full
