@@ -116,7 +116,7 @@ synth_design -top $topEntity -part $partNum
 
 # For ILAs, force a specific clock on the dbg_hub. this has the dbg_hub in the top file:
 # this is useful if ILAs are running on slower clocks, and hw manager is having issues connecting
-  connect_debug_port dbg_hub/clk [get_nets clk100]
+  # connect_debug_port dbg_hub/clk [get_nets clk100]
 
 if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
 populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
