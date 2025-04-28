@@ -61,10 +61,14 @@ set buildTimeStamp [getTimeStamp $startTime]
 puts "\n*** BUILD TIMESTAMP: $buildTimeStamp ***\n"
 puts "TCL Version : $tcl_version\n"
 
+# cd out of scripts up one level. assumes scripts is a submod in top level primary repo for design.
+# get the git hash of this primary design repo
 cd ../ 
 set ghash_msb [getGitHash]
 cd $curDir
 
+# version array organization with git hashes and timestamps. this currently is not automated so
+# must be populated by user for each submod. TODO: automate this! (parse .gitmodules? ...)
 # instance names:
 # <name>_git_hash_inst
 # <name>_timestamp_inst
