@@ -619,9 +619,12 @@ proc cleanIP {} {
 proc readHDL {fname {lib "work"}} {
   set debug 0
   set fType [file extension $fname]
-  if {$fType eq ".v" || $fType eq ".sv"} {
+  if {$fType eq ".v"} {
     if {$debug} {puts "VERILOG ADD $fname $lib"}
     read_verilog -library $lib $fname
+  } elseif {$fType eq ".sv"} {
+    if {$debug} {puts "SYSTEMVERILOG ADD $fname $lib"}
+    read_verilog -sv -library $lib $fname
   } elseif {[string match "*2008/*" $fname]} {
     if {$debug} {puts "VHDL-2008 ADD $fname $lib"}
     read_vhdl -library $lib -vhdl2008 $fname
