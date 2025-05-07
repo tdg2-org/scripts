@@ -1,22 +1,9 @@
 # See README.md
-#
-# -skipIP -skipBD  
-# -skipRM -skipSYN  -skipIMP 
-# -clean  -noCleanImg -cleanIP
-# -noRM, -noIP
-# -proj
-#
-# Top level build script
-# > tclsh RUN_BUILD.tcl
+# See ../device.info
 
-set VivadoPath "/opt/xilinx/Vivado/2023.2"
+set VivadoPath  "/opt/xilinx/Vivado"  ;# auto-appended with version. see support_procs.tcl getDeviceInfo
 
-set VivadoSettingsFile $VivadoPath/settings64.sh
-if {![file exist $VivadoPath]} {
-  puts "ERROR - Check Vivado install path.\n\"$VivadoPath\" DOES NOT EXIST"
-  exit
-}
-# verify correct dir or quit
+# verify script is sourced from correct directory
 set curDir [pwd]
 if {[file tail $curDir] ne "scripts"} {
   puts "Script must be sourced from the 'scripts' directory. You are in $curDir. Exiting." 
@@ -24,19 +11,24 @@ if {[file tail $curDir] ne "scripts"} {
 }
 source tcl/support_procs.tcl
 #--------------------------------------------------------------------------------------------------
+# get device and tool version from 'device.info' in project repo
+#--------------------------------------------------------------------------------------------------
+set partNum             ""  ;# from device.info file. defaults to u96v2 device  
+set vivadoVersion       ""  ;# vivado/vitis version from device.info file. defaults to 2023.2
+set VivadoSettingsFile  ""  ;# auto populated
+getDeviceInfo               ;# populates device part and tool version
+#--------------------------------------------------------------------------------------------------
 # set some vars for use in other sourced scripts
 #--------------------------------------------------------------------------------------------------
 set TOP_ENTITY  "top_io" ;# top entity name or image/bit file generated name...
-#set partNum     "xczu3eg-sbva484-1-i" ;# U96v2
-set partNum     "xczu1cg-sbva484-1-e" ;# ZUBoard
 set hdlDir      "../hdl"
 set simDir      "../hdl/tb"
 set ipDir       "../ip"
 set xdcDir      "../xdc"
 set bdDir       "../bd"
-set extraBDs    ""              ;# additional BDs other than top. auto-populated, don't touch.
-set topBD       [getBDs]        ;# default = "top_bd"
-set topBDtcl    [getBDtclName]  ;# default = "top_bd" for top_bd.tcl
+set extraBDs    ""                ;# additional BDs other than top. auto-populated, don't touch.
+set topBD       [getBDs]          ;# default = "top_bd"
+set topBDtcl    [getBDtclName]    ;# default = "top_bd" for top_bd.tcl
 set projName    [getProjName]
 set outputDir   [getOutputDir]
 #--------------------------------------------------------------------------------------------------
@@ -75,13 +67,15 @@ cd $curDir
 # leave 1st column empty, it gets populated with git hash
 # 2nd column has <name> which will be appended to as above
 # 3rd column is path to repo/submod (from scripts), to get git hash
-set versionInfo [list \
-  {"" top       ../           }\
-  {"" bd        ../           }\
-  {"" led       ./            }\
-  {"" scripts   ./            }
-#  {"" common    ../sub/common }
-]
+set versionInfo ""
+getSubMods
+#set versionInfo [list \
+#  {"" top       ../           }\
+#  {"" bd        ../           }\
+#  {"" led       ./            }\
+#  {"" scripts   ./            }
+##  {"" common    ../sub/common }
+#]
 updateVersionInfo ;# populate git hashes
 
 # TODO: move all this into a proc...

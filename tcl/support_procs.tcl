@@ -408,10 +408,10 @@ proc findEntityName {fileName} {
   set fid [open $fileName r]
   set text [read $fid] 
   close $fid 
-  if {[regexp -nocase {entity\s+(\S+)} $text match moduleName]} {
+  if {[regexp -nocase {entity\s+(\S+)} $text matchvivadoVersionmoduleName]} {
     return $moduleName
   } else {
-    error "ERROR parsing for module name in $fileName. EXITING"
+    error "ERROR parsing for module name in $fileNvivadoVersionme. EXITING"
   }
 }
 
@@ -675,4 +675,95 @@ proc addHDLdir {dir} {
   
   # non-library hdl default 'work'
   addHDLdirFiles $dir
+}
+
+#--------------------------------------------------------------------------------------------------
+# Parse device.info in main repo for device part and tool version
+# default to u96 and vivado 2023.2 if no file
+#--------------------------------------------------------------------------------------------------
+proc getDeviceInfo {} {
+  upvar partNum partNum
+  upvar vivadoVersion vivadoVersion
+  upvar VivadoPath VivadoPath
+  upvar VivadoSettingsFile VivadoSettingsFile
+
+  set devInfoFile "../device.info"
+  if {![file exist $devInfoFile]} {
+    puts "ERROR: ../device.info does not exist. Default u96, vivado 2023.2"
+    set partNum "xczu3eg-sbva484-1-i" ;# U96v2
+    set vivadoVersion "2023.2"
+    return
+  }
+
+  #--------------------------------
+  set fp [open "../device.info" r]
+  while {[gets $fp line] >= 0} {
+      # Trim and remove comment (everything after '#')
+      set line [string trim $line]
+      if {[string first "#" $line] >= 0} {
+          set line [string trim [string range $line 0 [expr {[string first "#" $line] - 1}]]]
+      }
+      if {$line eq ""} {
+          continue
+      }
+
+      # Extract key and value separated by whitespace
+      if {[regexp {^(\w+)\s+(.+)} $line -> key value]} {
+          if {$key eq "version"} {
+              set vivadoVersion $value
+          } elseif {$key eq "part"} {
+              set partNum $value
+          }
+      }
+  }
+  close $fp
+  #------------------------------
+
+  if {$partNum == "" || $vivadoVersion == ""} {
+    puts "ERROR in device.info : partNum = $partNum, version = $vivadoVersion"
+    exit
+  }
+
+  append VivadoPath "/$vivadoVersion" 
+  set VivadoSettingsFile $VivadoPath/settings64.sh
+  if {![file exist $VivadoPath] || ![file exist $VivadoSettingsFile]} {
+    puts "ERROR - Check Vivado install path.\n\"$VivadoPath\"\n or Vivado Settings File = $VivadoSettingsFile"
+    exit
+  }
+}
+
+#--------------------------------------------------------------------------------------------------
+# Parse .gitmodules in main repo for all submodules
+# version array organization with git hashes and timestamps.
+# instance names:
+# <name>_git_hash_inst
+# <name>_timestamp_inst
+# leave 1st column empty, it gets populated with git hash
+# 2nd column has <name> which will be appended to as above
+# 3rd column is path to repo/submod (from scripts), to get git hash
+#--------------------------------------------------------------------------------------------------
+proc getSubMods {} {
+  
+  upvar versionInfo versionInfo
+  
+  # default values top and bd so the githash module can be in either
+  set versionInfo [list \
+    {"" top   ../   }\
+    {"" bd    ../   } 
+  ]
+
+  set filename "../.gitmodules"
+  set fp [open $filename r]
+  set subModDir ""
+  while {[gets $fp line] >= 0} {
+    set line [string trim $line]
+    if {[string match "path =*" $line]} {
+      set subModDir [string trim [string range $line 6 end]]
+      # Extract final component of the path
+      set name [file tail $subModDir]
+      lappend versionInfo [list "" $name ../$subModDir]
+    }
+  }
+  close $fp
+
 }
