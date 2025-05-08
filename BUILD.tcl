@@ -13,9 +13,9 @@ source tcl/support_procs.tcl
 #--------------------------------------------------------------------------------------------------
 # get device and tool version from 'device.info' in project repo
 #--------------------------------------------------------------------------------------------------
-set partNum             ""  ;# from device.info file. defaults to u96v2 device  
-set vivadoVersion       ""  ;# vivado/vitis version from device.info file. defaults to 2023.2
-set VivadoSettingsFile  ""  ;# auto populated
+#set partNum             ""  ;# from device.info file. defaults to u96v2 device  
+#set vivadoVersion       ""  ;# vivado/vitis version from device.info file. defaults to 2023.2
+#set VivadoSettingsFile  ""  ;# auto populated
 getDeviceInfo               ;# populates device part and tool version
 #--------------------------------------------------------------------------------------------------
 # set some vars for use in other sourced scripts
@@ -26,22 +26,10 @@ set simDir      "../hdl/tb"
 set ipDir       "../ip"
 set xdcDir      "../xdc"
 set bdDir       "../bd"
-set extraBDs    ""                ;# additional BDs other than top. auto-populated, don't touch.
 set topBD       [getBDs]          ;# default = "top_bd"
 set topBDtcl    [getBDtclName]    ;# default = "top_bd" for top_bd.tcl
 set projName    [getProjName]
 set outputDir   [getOutputDir]
-#--------------------------------------------------------------------------------------------------
-# DFX vars. These are auto-populated. DO NOT MODIFY.
-#--------------------------------------------------------------------------------------------------
-set RMs ""      ;# List of all reconfigurable modules, organized per RP
-set RPs ""      ;# List of all reconfigurable partitions.
-set RPlen ""    ;# Number of RPs in design
-set MaxRMs ""   ;# Number of RMs in the RP that has the largest number of RMs.
-set RMfname ""  ;# Single RM only, partial bitstream, using abstract shell. RM filename entered by user.
-set RMmodName "";# Single RM only, partial bitstream, using abstract shell. RM module name for RMfname.
-set RMdir  ""   ;# Single RM only, partial bitstream, using abstract shell. RM directory for RMfname.
-if {!("-noRM" in $argv)} {getDFXconfigs} ;# Proc to populate DFX vars/lists above.
 
 #--------------------------------------------------------------------------------------------------
 # Pre-build stuff
@@ -59,32 +47,11 @@ cd ../
 set ghash_msb [getGitHash]
 cd $curDir
 
-# version array organization with git hashes and timestamps. this currently is not automated so
-# must be populated by user for each submod. TODO: automate this! (parse .gitmodules? ...)
-# instance names:
-# <name>_git_hash_inst
-# <name>_timestamp_inst
-# leave 1st column empty, it gets populated with git hash
-# 2nd column has <name> which will be appended to as above
-# 3rd column is path to repo/submod (from scripts), to get git hash
-set versionInfo ""
-getSubMods
-#set versionInfo [list \
-#  {"" top       ../           }\
-#  {"" bd        ../           }\
-#  {"" led       ./            }\
-#  {"" scripts   ./            }
-##  {"" common    ../sub/common }
-#]
+getDFXconfigs     ;# auto config DFX. don't touch. will return clean if non-DFX
+getSubMods        ;# parse .gitmodules
 updateVersionInfo ;# populate git hashes
+getArgsInfo       ;# set some vars based on input args
 
-# TODO: move all this into a proc...
-if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj TRUE}   else {set fullProj FALSE}
-if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly TRUE} else {set bdProjOnly FALSE}
-if {("-sim" in $argv)}    {set simProj TRUE}    else {set simProj FALSE}
-if {("-RM" in $argv)}     {set RMabstract TRUE} else {set RMabstract FALSE}
-if {("-ipOnly" in $argv)} {set ipOnly TRUE}     else {set ipOnly FALSE}
-if {("-multBD" in $argv)} {set multipleBDs TRUE} else {set multipleBDs FALSE}
 
 # if BD project / sim or DFX partial only, skip all this
 if {!$bdProjOnly && !$simProj && !$RMabstract && !$fullProj && !$ipOnly} {

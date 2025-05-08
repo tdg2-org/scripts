@@ -6,11 +6,14 @@
 proc vivadoCmd {fileName args} {
   upvar VivadoSettingsFile VivadoSettingsFile
   upvar argv argv
+  set logName [file rootname $fileName]
   if {"-verbose" in $argv} {
-    set buildCmd "vivado -mode batch -source tcl/$fileName -nojournal -tclargs $args" ;# is there a better way...?
+    set buildCmd "vivado -mode batch -log $logName.log -journal $logName.jou -source tcl/$fileName -nojournal -tclargs $args" ;# is there a better way...?
   } else {
-    set buildCmd "vivado -mode batch -source tcl/$fileName -nojournal -notrace -tclargs $args" 
+    set buildCmd "vivado -mode batch -log $logName.log -journal $logName.jou -source tcl/$fileName -nojournal -notrace -tclargs $args" 
   }
+
+  #puts "\n\n\n******\n\n$buildCmd\n\n*****\n\n\n"
 
   ## sh points to dash instead of bash by default in Ubuntu
   #if {[catch {exec sh -c "source $VivadoSettingsFile; $buildCmd" >@stdout} cmdErr]} 
@@ -89,7 +92,10 @@ proc getBDs {} {
   upvar argc argc
   upvar bdDir bdDir
   upvar extraBDs extraBDs
+
+  set extraBDs    ""
   set defaultTopBDName "top_bd"
+
   if {"-BDName" in $argv} {
     set BDNameIdx [lsearch $argv "-BDName"]
     set BDNameIdx [expr $BDNameIdx + 1]
@@ -211,7 +217,7 @@ proc getTimeStampXlnx {} {
 }
 
 #--------------------------------------------------------------------------------------------------
-# 
+# Gets git hash. Don't modify quickly, used multiple places and loops.
 #--------------------------------------------------------------------------------------------------
 proc getGitHash {} {
   if {[catch {exec git rev-parse HEAD}]} {
@@ -452,6 +458,20 @@ proc getDFXconfigs {} {
   upvar RPs RPs 
   upvar RPlen RPlen
   upvar MaxRMs MaxRMs
+  upvar RMfname RMfname
+  upvar RMmodName RMmodName
+  upvar RMdir RMdir
+
+  # DFX vars. These are auto-populated. DO NOT MODIFY.
+  set RMs ""      ;# List of all reconfigurable modules, organized per RP
+  set RPs ""      ;# List of all reconfigurable partitions.
+  set RPlen ""    ;# Number of RPs in design
+  set MaxRMs ""   ;# Number of RMs in the RP that has the largest number of RMs.
+  set RMfname ""  ;# Single RM only, partial bitstream, using abstract shell. RM filename entered by user.
+  set RMmodName "";# Single RM only, partial bitstream, using abstract shell. RM module name for RMfname.
+  set RMdir  ""   ;# Single RM only, partial bitstream, using abstract shell. RM directory for RMfname.
+
+  if {("-noRM" in $argv)} {return} ;# skip if -noRM arg. but need empty vars above
 
   # first get all directories in hdl that have 'RM*' name
   set RMDirs [glob -nocomplain -tails -directory $hdlDir -type d RM*]
@@ -500,9 +520,9 @@ proc getDFXconfigs {} {
 
   # partial run only
   if {("-RM" in $argv)} {
-    upvar RMfname RMfname
-    upvar RMmodName RMmodName
-    upvar RMdir RMdir
+    #upvar RMfname RMfname
+    #upvar RMmodName RMmodName
+    #upvar RMdir RMdir
     getRMabstract
   }
 }
@@ -765,5 +785,25 @@ proc getSubMods {} {
     }
   }
   close $fp
+}
+
+#--------------------------------------------------------------------------------------------------
+# Set some vars based on input args
+#--------------------------------------------------------------------------------------------------
+proc getArgsInfo {} {
+  upvar argv        argv
+  upvar fullProj    fullProj   
+  upvar bdProjOnly  bdProjOnly 
+  upvar simProj     simProj    
+  upvar RMabstract  RMabstract 
+  upvar ipOnly      ipOnly     
+  upvar multipleBDs multipleBDs
+
+  if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj     TRUE} else {set fullProj    FALSE}
+  if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly   TRUE} else {set bdProjOnly  FALSE}
+  if {("-sim" in $argv)}                          {set simProj      TRUE} else {set simProj     FALSE}
+  if {("-RM" in $argv)}                           {set RMabstract   TRUE} else {set RMabstract  FALSE}
+  if {("-ipOnly" in $argv)}                       {set ipOnly       TRUE} else {set ipOnly      FALSE}
+  if {("-multBD" in $argv)}                       {set multipleBDs  TRUE} else {set multipleBDs FALSE}
 
 }
