@@ -298,6 +298,56 @@ proc endCleanProc {} {
 # If output_products exists from previous build, keep and rename to previous, delete old previous
 #--------------------------------------------------------------------------------------------------
 proc outputDirGen {} {
+  upvar outputDir       outputDir
+  upvar buildTimeStamp  timeStampVal
+  upvar ghash_msb       ghash_msb
+  upvar TOP_ENTITY      TOP_ENTITY
+  upvar RPs             RPs 
+  upvar argv            argv
+  upvar bdProjOnly      bdProjOnly
+  upvar simProj         simProj
+  upvar RMabstract      RMabstract
+  upvar fullProj        fullProj
+  upvar ipOnly          ipOnly
+  upvar RMabstract      RMabstract
+  upvar imageFolder     imageFolder
+
+  #-----------------
+  set cleanOutputNeeded [expr {!$bdProjOnly && !$simProj && !$RMabstract && !$fullProj && !$ipOnly}]
+  set forceClean     [expr {"-forceCleanImg" in $argv}]
+  set skipCleanHints [expr {"-noCleanImg" in $argv || "-skipSYN" in $argv || "-skipIMP" in $argv || 
+                            "-skipRM" in $argv || "-out" in $argv}]
+
+  if {$cleanOutputNeeded} {
+    if {$forceClean || !$skipCleanHints} {
+      #set imageFolder [outputDirGen]
+      puts "\n** Creating new output_products. **"
+    } else {
+      puts "\n** Skipping clean output_products. **"
+      return  ;#done
+    }
+  } elseif {$RMabstract} {
+    puts "\n*** DFX Partial only ***"
+    return  ;#done
+  } else {
+    puts "\n*** Generating project only ***"
+    return  ;#done
+  }
+
+  #--------------
+  if {[file exists $outputDir]} {
+    append newOutputDir $outputDir "_previous"
+    file delete -force $newOutputDir
+    file rename -force $outputDir $newOutputDir
+  }
+  file mkdir $outputDir
+  set buildFolder $timeStampVal\_$ghash_msb
+  file mkdir $outputDir/$buildFolder
+
+  set imageFolder "$outputDir/$buildFolder"
+}
+
+proc outputDirGenOLD {} {
   upvar outputDir outputDir
   upvar buildTimeStamp timeStampVal
   upvar ghash_msb ghash_msb
@@ -315,6 +365,7 @@ proc outputDirGen {} {
 
   return "$outputDir/$buildFolder"
 }
+
 
 #--------------------------------------------------------------------------------------------------
 # TODO: not tested this won't work yet
