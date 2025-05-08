@@ -53,9 +53,9 @@ updateVersionInfo ;# populate git hashes
 getArgsInfo       ;# set some vars based on input args
 outputDirGen      ;# generate output products directory
 
-if {"-noIP" in $argv} {set noIP TRUE } else {set noIP [getIPs]};#returns TRUE if there are no IPs
-if {"-clean" in $argv} {cleanProc} 
-if {"-cleanIP" in $argv} {cleanIP}
+#if {"-noIP" in $argv} {set noIP TRUE } else {set noIP [getIPs]};#returns TRUE if there are no IPs
+#if {"-clean" in $argv} {cleanProc} 
+#if {"-cleanIP" in $argv} {cleanIP}
 
 #--------------------------------------------------------------------------------------------------
 # vivado synth/impl commands

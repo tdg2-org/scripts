@@ -849,6 +849,8 @@ proc getArgsInfo {} {
   upvar RMabstract  RMabstract 
   upvar ipOnly      ipOnly     
   upvar multipleBDs multipleBDs
+  upvar ipDir       ipDir
+  upvar noIP        noIP
 
   if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj     TRUE} else {set fullProj    FALSE}
   if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly   TRUE} else {set bdProjOnly  FALSE}
@@ -856,5 +858,9 @@ proc getArgsInfo {} {
   if {("-RM" in $argv)}                           {set RMabstract   TRUE} else {set RMabstract  FALSE}
   if {("-ipOnly" in $argv)}                       {set ipOnly       TRUE} else {set ipOnly      FALSE}
   if {("-multBD" in $argv)}                       {set multipleBDs  TRUE} else {set multipleBDs FALSE}
+  
+  if {"-noIP" in $argv} {set noIP TRUE} else {set noIP [getIPs]};#returns TRUE if there are no IPs
+  if {"-clean" in $argv} {cleanProc} 
+  if {"-cleanIP" in $argv} {cleanIP}
 
 }
