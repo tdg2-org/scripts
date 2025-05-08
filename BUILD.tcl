@@ -51,30 +51,9 @@ getDFXconfigs     ;# auto config DFX. don't touch. will return clean if non-DFX
 getSubMods        ;# parse .gitmodules
 updateVersionInfo ;# populate git hashes
 getArgsInfo       ;# set some vars based on input args
+outputDirGen      ;# generate output products directory
 
-outputDirGen
-
-# if BD project / sim or DFX partial only, skip all this
-#if {!$bdProjOnly && !$simProj && !$RMabstract && !$fullProj && !$ipOnly} {
-#  if {("-forceCleanImg" in $argv)} {
-#    set imageFolder [outputDirGen]
-#  } elseif {("-noCleanImg" in $argv) || ("-skipSYN" in $argv) || ("-skipIMP" in $argv) || \
-#            ("-skipRM" in $argv) || ("-out" in $argv)} {
-#    puts "\n** Skipping clean output_products. **"
-#  } else {
-#    set imageFolder [outputDirGen]
-#  }
-#} else {
-#  if {$RMabstract} {
-#    puts "\n*** DFX Partial only ***"
-#  } else {
-#    puts "\n*** Generating project only ***"
-#  }
-#}
-
-
-
-if {"-noIP" in $argv} { set noIP TRUE } else {set noIP [getIPs]};#returns TRUE if there are no IPs
+if {"-noIP" in $argv} {set noIP TRUE } else {set noIP [getIPs]};#returns TRUE if there are no IPs
 if {"-clean" in $argv} {cleanProc} 
 if {"-cleanIP" in $argv} {cleanIP}
 
