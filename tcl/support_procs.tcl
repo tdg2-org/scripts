@@ -314,24 +314,40 @@ proc outputDirGen {} {
 
   #-----------------
   set cleanOutputNeeded [expr {!$bdProjOnly && !$simProj && !$RMabstract && !$fullProj && !$ipOnly}]
-  set forceClean     [expr {"-forceCleanImg" in $argv}]
-  set skipCleanHints [expr {"-noCleanImg" in $argv || "-skipSYN" in $argv || "-skipIMP" in $argv || 
-                            "-skipRM" in $argv || "-out" in $argv}]
+  set forceClean        [expr {"-forceCleanImg" in $argv}]
+  set skipCleanHints    [expr {"-noCleanImg" in $argv || "-skipSYN" in $argv || "-skipIMP" in $argv || 
+                               "-skipRM" in $argv || "-out" in $argv}]
 
   if {$cleanOutputNeeded} {
     if {$forceClean || !$skipCleanHints} {
       #set imageFolder [outputDirGen]
       puts "\n** Creating new output_products. **"
+      set skipOutputGen FALSE
     } else {
       puts "\n** Skipping clean output_products. **"
-      return  ;#done
+      #return  ;#done
+      set skipOutputGen TRUE
     }
   } elseif {$RMabstract} {
     puts "\n*** DFX Partial only ***"
-    return  ;#done
+    #return  ;#done
+    set skipOutputGen TRUE
   } else {
     puts "\n*** Generating project only ***"
-    return  ;#done
+    #return  ;#done
+    set skipOutputGen TRUE
+  }
+
+  # if skipping, get the existing imageFolder name
+  if {$skipOutputGen} {
+    foreach item [glob -directory $outputDir -types d *] {
+      set folderName [file tail $item]
+      if {[regexp {^[A-Fa-f0-9]{8}_[A-Fa-f0-9]{16}$} $folderName]} {
+        set imageFolder "$outputDir/$folderName"
+        break
+      }
+    }
+    return ;#done
   }
 
   #--------------
@@ -368,22 +384,54 @@ proc outputDirGenOLD {} {
 
 
 #--------------------------------------------------------------------------------------------------
-# TODO: not tested this won't work yet
-# need 
+# tar/zip bit/xsa for 'release'. input arg = -release
+# not tested extensively, depends on other procs
+# not intended to be used in partial builds, or DFX partials - will probably error
 #--------------------------------------------------------------------------------------------------
 proc packageImage {} {
+  upvar argv argv
   upvar outputDir outputDir
   upvar imageFolder imageFolder
   
-  puts "packageImage WONT WORK YET, FIX IT **************";exit;
+  if {!("-release" in $argv)} {return} ;# not formal release. done
+
+  set releaseIdx [lsearch $argv "-release"]
+  set releaseTypeIdx [expr $releaseIdx + 1]
+  set releaseType [lindex $argv $releaseTypeIdx]
+  if {!($releaseType == "-tar") && !($releaseType == "-zip")} {
+    puts "ERROR: -release arg must be followed directly by -tar or -zip. skipping release"
+    return
+  }
+
+
+  if {![info exists imageFolder]} {set imageFolder "$outputDir/ReleaseImage"} ;# just in case
+
+  file copy -force -- "$outputDir/bit" $imageFolder
+  file copy -force -- [glob -nocomplain $outputDir/*.xsa] $imageFolder
+
+  set curDir [pwd]
+  cd $outputDir 
+  set imageFolderTail [file tail $imageFolder]
+  
+  if {$releaseType == "-tar"} {exec tar -czf "$imageFolderTail.tar.gz" $imageFolderTail}
+  if {$releaseType == "-zip"} {exec zip -r $imageFolderTail.zip $imageFolderTail}
+
+  file delete -force $imageFolder
+  #file delete -force "$outputDir/bit"
+  #file delete -force [glob -nocomplain $outputDir/*.xsa]
+
+  cd $curDir
+
+  
+  #puts "packageImage WONT WORK YET, FIX IT **************";exit;
   
   # Stop and exit if no xsa
-  if {![file exists $outputDir/$TOP_ENTITY.xsa]} {puts "ERROR: $TOP_ENTITY.xsa not found!";exit}
+  #if {![file exists $outputDir/$TOP_ENTITY.xsa]} {puts "ERROR: $TOP_ENTITY.xsa not found!";exit}
 
-  set bitFiles [glob -nocomplain *.bit]
-  foreach x $bitFiles {
-    file rename -force $outputDir/$x $outputDirImage/$buildFolder/$TOP_ENTITY.bit
-  }
+  #set bitFiles [glob -nocomplain *.bit]
+  #foreach x $bitFiles {
+  #  file rename -force $outputDir/$x $outputDirImage/$buildFolder/$TOP_ENTITY.bit
+  #}
 
   ###catch {file rename -force $outputDir/$TOP_ENTITY.ltx $outputDirImage/$buildFolder/$TOP_ENTITY.ltx}
   ###catch {file rename -force $outputDir/$TOP_ENTITY.bit $outputDirImage/$buildFolder/$TOP_ENTITY.bit}

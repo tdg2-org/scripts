@@ -116,6 +116,9 @@
               "output_products_<cfg-name>".
 
 -sim        : generate vivado project for simulation only. use with -name.
+
+-release    : "-release <type>". bit/xsa files will be tar/zipped. must be followed by -tar
+              or -zip
 ```
 
 ## Examples / Quick copies
@@ -206,5 +209,5 @@
 - Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
 - Added -ipOnly arg.
 - Added automation for versioning modules (git hash / timestamp).
-
+- Added -release arg to zip/tar xsa/bit files.
 

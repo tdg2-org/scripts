@@ -1,6 +1,8 @@
 # See README.md
 # See ../device.info
 
+# TODO add this somewhere:   set_param general.maxThreads <value>
+
 set VivadoPath  "/opt/xilinx/Vivado"  ;# auto-appended with version. see support_procs.tcl getDeviceInfo
 
 # verify script is sourced from correct directory
@@ -9,14 +11,10 @@ if {[file tail $curDir] ne "scripts"} {
   puts "Script must be sourced from the 'scripts' directory. You are in $curDir. Exiting." 
   exit
 }
+
 source tcl/support_procs.tcl
-#--------------------------------------------------------------------------------------------------
-# get device and tool version from 'device.info' in project repo
-#--------------------------------------------------------------------------------------------------
-#set partNum             ""  ;# from device.info file. defaults to u96v2 device  
-#set vivadoVersion       ""  ;# vivado/vitis version from device.info file. defaults to 2023.2
-#set VivadoSettingsFile  ""  ;# auto populated
-getDeviceInfo               ;# populates device part and tool version
+
+getDeviceInfo ;# populates device part and tool version from 'device.info' in primary project repo
 #--------------------------------------------------------------------------------------------------
 # set some vars for use in other sourced scripts
 #--------------------------------------------------------------------------------------------------
@@ -49,13 +47,9 @@ cd $curDir
 
 getDFXconfigs     ;# auto config DFX. don't touch. will return clean if non-DFX
 getSubMods        ;# parse .gitmodules
-updateVersionInfo ;# populate git hashes
+updateVersionInfo ;# populate git hashes. exits clean if none instantiated in design
 getArgsInfo       ;# set some vars based on input args
 outputDirGen      ;# generate output products directory
-
-#if {"-noIP" in $argv} {set noIP TRUE } else {set noIP [getIPs]};#returns TRUE if there are no IPs
-#if {"-clean" in $argv} {cleanProc} 
-#if {"-cleanIP" in $argv} {cleanIP}
 
 #--------------------------------------------------------------------------------------------------
 # vivado synth/impl commands
@@ -99,14 +93,8 @@ if {$simProj} { ;# arg = "-sim"
 # Post-build stuff
 #--------------------------------------------------------------------------------------------------
 
-# check output_products folder at end
-# packageImage
-
+packageImage ;# if -release argv is used, bit/xsa will be tar/zipped
 buildTimeEnd
 endCleanProc
 cleanProc
-
-#close_project -delete
-
-#set_param general.maxThreads <value>
 
