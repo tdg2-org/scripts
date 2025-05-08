@@ -20,6 +20,7 @@ set genProj     [lindex $argv 9]
 set extraBDs    [lindex $argv 10]
 set timeStamp   [lindex $argv 11]
 set versionInfo [lindex $argv 12]
+set multipleBDs [lindex $argv 13]
 
 set_part $partNum
 
@@ -71,20 +72,21 @@ foreach x $filesXDC {
 #--------------------------------------------------------------------------------------------------
 # extra BDs
 #--------------------------------------------------------------------------------------------------
-foreach extraBDfile $extraBDs {
-  # in-memory or saved BD project
-  if {$projName == "DEFAULT_PROJECT"} {
-    set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
-    set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
-  } else {
-    set bdFile        "../$projName/$projName.srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
-    set wrapperFile   "../$projName/$projName.gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+if {$multipleBDs} {
+  foreach extraBDfile $extraBDs {
+    # in-memory or saved BD project
+    if {$projName == "DEFAULT_PROJECT"} {
+      set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+      set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+    } else {
+      set bdFile        "../$projName/$projName.srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+      set wrapperFile   "../$projName/$projName.gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+    }
+
+    read_bd $bdFile
+    read_verilog $wrapperFile
   }
-
-  read_bd $bdFile
-  read_verilog $wrapperFile
 }
-
 #--------------------------------------------------------------------------------------------------
 # TOP BD (primary)
 #--------------------------------------------------------------------------------------------------
@@ -111,6 +113,11 @@ if {$genProj} {
 # synth 
 #--------------------------------------------------------------------------------------------------
 synth_design -top $topEntity -part $partNum
+
+# For ILAs, force a specific clock on the dbg_hub. this has the dbg_hub in the top file:
+# this is useful if ILAs are running on slower clocks, and hw manager is having issues connecting
+  # connect_debug_port dbg_hub/clk [get_nets clk100]
+
 if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
 populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
 write_checkpoint -force $imageDir/dcp/top_synth.dcp

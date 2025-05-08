@@ -14,14 +14,15 @@
 #--------------------------------------------------------------------------------------------------
 source tcl/support_procs.tcl
 
-set hdlDir    [lindex $argv 0]
-set partNum   [lindex $argv 1]
-set bdDir     [lindex $argv 2]
-set projName  [lindex $argv 3]
-set topBD     [lindex $argv 4]
-set topBDtcl  [lindex $argv 5]
-set extraBDs  [lindex $argv 6]
-set ipDir     [lindex $argv 7]
+set hdlDir      [lindex $argv 0]
+set partNum     [lindex $argv 1]
+set bdDir       [lindex $argv 2]
+set projName    [lindex $argv 3]
+set topBD       [lindex $argv 4]
+set topBDtcl    [lindex $argv 5]
+set extraBDs    [lindex $argv 6]
+set ipDir       [lindex $argv 7]
+set multipleBDs [lindex $argv 8]
 
 set_part $partNum ;# might not need this
 create_project $projName -part $partNum -in_memory
@@ -43,18 +44,19 @@ addHDLdir ../sub/common/hdl/bd
 #--------------------------------------------------------------------------------------------------
 # additional BDs 
 #--------------------------------------------------------------------------------------------------
-foreach extraBDfile $extraBDs {
-  source $bdDir/$extraBDfile.tcl
-  set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
-  set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+if {$multipleBDs} {
+  foreach extraBDfile $extraBDs {
+    source $bdDir/$extraBDfile.tcl
+    set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+    set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
 
-  make_wrapper -files [get_files $bdFile] -top
-  read_verilog $wrapperFile
-  set_property synth_checkpoint_mode None [get_files $bdFile]
-  generate_target all [get_files $bdFile]
-  set_property top [file rootname [file tail $wrapperFile]] [current_fileset]  
+    make_wrapper -files [get_files $bdFile] -top
+    read_verilog $wrapperFile
+    set_property synth_checkpoint_mode None [get_files $bdFile]
+    generate_target all [get_files $bdFile]
+    set_property top [file rootname [file tail $wrapperFile]] [current_fileset]  
+  }
 }
-
 #--------------------------------------------------------------------------------------------------
 # add non-bd XCI files here from IP folder, for convenience
 #--------------------------------------------------------------------------------------------------

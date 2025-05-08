@@ -8,6 +8,7 @@
 ### TODO: 
 - -skipIMP and -skipSYN args will not create the output_products folder, need to check if 
   exists first, create only if NOT exist
+- A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
@@ -97,6 +98,13 @@
 -BDName     : name of BD within tcl script. "-BDname <bd-name>". Default is "top_bd" if not 
               provided.
 
+-multBD     : this needs to be added if there are multiple BDs in the design. temporary fix
+              for using the above -BDtcl,-BDName args, which implies multiple BD tcl files
+              in the BD folder. adding -multBD arg assumes every tcl file in the BD folder
+              will be processes and used in the design. without -multBD (default), only 
+              a single BD will be used, "top_bd" as default, or BD that is given using the
+              -BDtcl and/or -BDName args.
+
 -verbose    : print script tcl for debug. prevent usage of -notrace for vivado commands.
 
 -out        : "-out <output_products-directory-name>". Custom name of directory location for 
@@ -108,6 +116,9 @@
               "output_products_<cfg-name>".
 
 -sim        : generate vivado project for simulation only. use with -name.
+
+-release    : "-release <type>". bit/xsa files will be tar/zipped. must be followed by -tar
+              or -zip
 ```
 
 ## Examples / Quick copies
@@ -154,6 +165,11 @@
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2008/led_cnt3_T.vhd -skipRM  
 > tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/2019/led_cnt3_U.vhd  
 > tclsh BUILD.tcl -name PRJ0 -skipIP -skipBD -RM RM2/led_cnt3_vers.sv  
+> tclsh BUILD.tcl -name PRJ2 -skipIP -skipBD -RM RM0/i2c_top.sv -clean  
+> tclsh BUILD.tcl -name PRJ0 -skipIP -skipBD -RM RM0/i2c_top.sv -clean  
+> tclsh BUILD.tcl -name PRJ0 -clean -skipBD -RM RM0/i2c_top.sv  
+> tclsh BUILD.tcl -name PRJ0 -clean -skipBD -skipIP -RM RM0/i2c_top.sv
+> tclsh BUILD.tcl -clean -name PRJ1 -skipBD -skipIP -RM RM0/i2c_top.sv
 
 #### Build full project will all sources, no IP outside of BD
 > tclsh BUILD.tcl -name PRJ2 -noIP -proj -full
@@ -180,10 +196,18 @@
   - All partial bitstreams are generated, in addition to RMs not part of the single full config.
 - Abstract shell checkpoints are generated for all RPs. Build new/modified RMs and partial bitsreams with -RM option.
 - All HDL types including VHDL-2008/2019. Any 2008/2019 files must be in respective 2008/2019 folders.
+- Steps to configure:
+  1. Build first as non-DFX full design with RMs in hdl directory (NOT RM folders).
+  2. Floorplan RMs and save constraints.
+  3. Move RMs to RM folders.
+  4. Include blackbox module declarations with RM instantiations, for building static.
+  5. Build. First will be static + partials. After this, partials can be built independently.
+**TODO: A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
+
 
 #### Updates/Changes
 - Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
 - Added -ipOnly arg.
 - Added automation for versioning modules (git hash / timestamp).
-
+- Added -release arg to zip/tar xsa/bit files.
 

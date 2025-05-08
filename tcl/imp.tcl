@@ -47,6 +47,7 @@ if {$RMmodName != ""} {
   read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir/$RMdir\_post_synth_$RMfnameRoot.dcp
   place_n_route "$RMdir\_$RMmodName\_$RMfnameRoot"
   write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit
+  write_debug_probes -force $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial_ila_probes.ltx
   return ;# done, return from this script
 }
 

@@ -6,11 +6,14 @@
 proc vivadoCmd {fileName args} {
   upvar VivadoSettingsFile VivadoSettingsFile
   upvar argv argv
+  set logName [file rootname $fileName]
   if {"-verbose" in $argv} {
-    set buildCmd "vivado -mode batch -source tcl/$fileName -nojournal -tclargs $args" ;# is there a better way...?
+    set buildCmd "vivado -mode batch -log $logName.log -journal $logName.jou -source tcl/$fileName -nojournal -tclargs $args" ;# is there a better way...?
   } else {
-    set buildCmd "vivado -mode batch -source tcl/$fileName -nojournal -notrace -tclargs $args" 
+    set buildCmd "vivado -mode batch -log $logName.log -journal $logName.jou -source tcl/$fileName -nojournal -notrace -tclargs $args" 
   }
+
+  #puts "\n\n\n******\n\n$buildCmd\n\n*****\n\n\n"
 
   ## sh points to dash instead of bash by default in Ubuntu
   #if {[catch {exec sh -c "source $VivadoSettingsFile; $buildCmd" >@stdout} cmdErr]} 
@@ -89,7 +92,10 @@ proc getBDs {} {
   upvar argc argc
   upvar bdDir bdDir
   upvar extraBDs extraBDs
+
+  set extraBDs    ""
   set defaultTopBDName "top_bd"
+
   if {"-BDName" in $argv} {
     set BDNameIdx [lsearch $argv "-BDName"]
     set BDNameIdx [expr $BDNameIdx + 1]
@@ -211,7 +217,7 @@ proc getTimeStampXlnx {} {
 }
 
 #--------------------------------------------------------------------------------------------------
-# 
+# Gets git hash. Don't modify quickly, used multiple places and loops.
 #--------------------------------------------------------------------------------------------------
 proc getGitHash {} {
   if {[catch {exec git rev-parse HEAD}]} {
@@ -292,6 +298,72 @@ proc endCleanProc {} {
 # If output_products exists from previous build, keep and rename to previous, delete old previous
 #--------------------------------------------------------------------------------------------------
 proc outputDirGen {} {
+  upvar outputDir       outputDir
+  upvar buildTimeStamp  timeStampVal
+  upvar ghash_msb       ghash_msb
+  upvar TOP_ENTITY      TOP_ENTITY
+  upvar RPs             RPs 
+  upvar argv            argv
+  upvar bdProjOnly      bdProjOnly
+  upvar simProj         simProj
+  upvar RMabstract      RMabstract
+  upvar fullProj        fullProj
+  upvar ipOnly          ipOnly
+  upvar RMabstract      RMabstract
+  upvar imageFolder     imageFolder
+
+  #-----------------
+  set cleanOutputNeeded [expr {!$bdProjOnly && !$simProj && !$RMabstract && !$fullProj && !$ipOnly}]
+  set forceClean        [expr {"-forceCleanImg" in $argv}]
+  set skipCleanHints    [expr {"-noCleanImg" in $argv || "-skipSYN" in $argv || "-skipIMP" in $argv || 
+                               "-skipRM" in $argv || "-out" in $argv}]
+
+  if {$cleanOutputNeeded} {
+    if {$forceClean || !$skipCleanHints} {
+      #set imageFolder [outputDirGen]
+      puts "\n** Creating new output_products. **"
+      set skipOutputGen FALSE
+    } else {
+      puts "\n** Skipping clean output_products. **"
+      #return  ;#done
+      set skipOutputGen TRUE
+    }
+  } elseif {$RMabstract} {
+    puts "\n*** DFX Partial only ***"
+    #return  ;#done
+    set skipOutputGen TRUE
+  } else {
+    puts "\n*** Generating project only ***"
+    #return  ;#done
+    set skipOutputGen TRUE
+  }
+
+  # if skipping, get the existing imageFolder name
+  if {$skipOutputGen} {
+    foreach item [glob -directory $outputDir -types d *] {
+      set folderName [file tail $item]
+      if {[regexp {^[A-Fa-f0-9]{8}_[A-Fa-f0-9]{16}$} $folderName]} {
+        set imageFolder "$outputDir/$folderName"
+        break
+      }
+    }
+    return ;#done
+  }
+
+  #--------------
+  if {[file exists $outputDir]} {
+    append newOutputDir $outputDir "_previous"
+    file delete -force $newOutputDir
+    file rename -force $outputDir $newOutputDir
+  }
+  file mkdir $outputDir
+  set buildFolder $timeStampVal\_$ghash_msb
+  file mkdir $outputDir/$buildFolder
+
+  set imageFolder "$outputDir/$buildFolder"
+}
+
+proc outputDirGenOLD {} {
   upvar outputDir outputDir
   upvar buildTimeStamp timeStampVal
   upvar ghash_msb ghash_msb
@@ -310,23 +382,56 @@ proc outputDirGen {} {
   return "$outputDir/$buildFolder"
 }
 
+
 #--------------------------------------------------------------------------------------------------
-# TODO: not tested this won't work yet
-# need 
+# tar/zip bit/xsa for 'release'. input arg = -release
+# not tested extensively, depends on other procs
+# not intended to be used in partial builds, or DFX partials - will probably error
 #--------------------------------------------------------------------------------------------------
 proc packageImage {} {
+  upvar argv argv
   upvar outputDir outputDir
   upvar imageFolder imageFolder
   
-  puts "packageImage WONT WORK YET, FIX IT **************";exit;
+  if {!("-release" in $argv)} {return} ;# not formal release. done
+
+  set releaseIdx [lsearch $argv "-release"]
+  set releaseTypeIdx [expr $releaseIdx + 1]
+  set releaseType [lindex $argv $releaseTypeIdx]
+  if {!($releaseType == "-tar") && !($releaseType == "-zip")} {
+    puts "ERROR: -release arg must be followed directly by -tar or -zip. skipping release"
+    return
+  }
+
+
+  if {![info exists imageFolder]} {set imageFolder "$outputDir/ReleaseImage"} ;# just in case
+
+  file copy -force -- "$outputDir/bit" $imageFolder
+  file copy -force -- [glob -nocomplain $outputDir/*.xsa] $imageFolder
+
+  set curDir [pwd]
+  cd $outputDir 
+  set imageFolderTail [file tail $imageFolder]
+  
+  if {$releaseType == "-tar"} {exec tar -czf "$imageFolderTail.tar.gz" $imageFolderTail}
+  if {$releaseType == "-zip"} {exec zip -r $imageFolderTail.zip $imageFolderTail}
+
+  file delete -force $imageFolder
+  #file delete -force "$outputDir/bit"
+  #file delete -force [glob -nocomplain $outputDir/*.xsa]
+
+  cd $curDir
+
+  
+  #puts "packageImage WONT WORK YET, FIX IT **************";exit;
   
   # Stop and exit if no xsa
-  if {![file exists $outputDir/$TOP_ENTITY.xsa]} {puts "ERROR: $TOP_ENTITY.xsa not found!";exit}
+  #if {![file exists $outputDir/$TOP_ENTITY.xsa]} {puts "ERROR: $TOP_ENTITY.xsa not found!";exit}
 
-  set bitFiles [glob -nocomplain *.bit]
-  foreach x $bitFiles {
-    file rename -force $outputDir/$x $outputDirImage/$buildFolder/$TOP_ENTITY.bit
-  }
+  #set bitFiles [glob -nocomplain *.bit]
+  #foreach x $bitFiles {
+  #  file rename -force $outputDir/$x $outputDirImage/$buildFolder/$TOP_ENTITY.bit
+  #}
 
   ###catch {file rename -force $outputDir/$TOP_ENTITY.ltx $outputDirImage/$buildFolder/$TOP_ENTITY.ltx}
   ###catch {file rename -force $outputDir/$TOP_ENTITY.bit $outputDirImage/$buildFolder/$TOP_ENTITY.bit}
@@ -408,10 +513,10 @@ proc findEntityName {fileName} {
   set fid [open $fileName r]
   set text [read $fid] 
   close $fid 
-  if {[regexp -nocase {entity\s+(\S+)} $text match moduleName]} {
+  if {[regexp -nocase {entity\s+(\S+)} $text matchvivadoVersionmoduleName]} {
     return $moduleName
   } else {
-    error "ERROR parsing for module name in $fileName. EXITING"
+    error "ERROR parsing for module name in $fileNvivadoVersionme. EXITING"
   }
 }
 
@@ -452,6 +557,20 @@ proc getDFXconfigs {} {
   upvar RPs RPs 
   upvar RPlen RPlen
   upvar MaxRMs MaxRMs
+  upvar RMfname RMfname
+  upvar RMmodName RMmodName
+  upvar RMdir RMdir
+
+  # DFX vars. These are auto-populated. DO NOT MODIFY.
+  set RMs ""      ;# List of all reconfigurable modules, organized per RP
+  set RPs ""      ;# List of all reconfigurable partitions.
+  set RPlen ""    ;# Number of RPs in design
+  set MaxRMs ""   ;# Number of RMs in the RP that has the largest number of RMs.
+  set RMfname ""  ;# Single RM only, partial bitstream, using abstract shell. RM filename entered by user.
+  set RMmodName "";# Single RM only, partial bitstream, using abstract shell. RM module name for RMfname.
+  set RMdir  ""   ;# Single RM only, partial bitstream, using abstract shell. RM directory for RMfname.
+
+  if {("-noRM" in $argv)} {return} ;# skip if -noRM arg. but need empty vars above
 
   # first get all directories in hdl that have 'RM*' name
   set RMDirs [glob -nocomplain -tails -directory $hdlDir -type d RM*]
@@ -500,9 +619,9 @@ proc getDFXconfigs {} {
 
   # partial run only
   if {("-RM" in $argv)} {
-    upvar RMfname RMfname
-    upvar RMmodName RMmodName
-    upvar RMdir RMdir
+    #upvar RMfname RMfname
+    #upvar RMmodName RMmodName
+    #upvar RMdir RMdir
     getRMabstract
   }
 }
@@ -619,9 +738,12 @@ proc cleanIP {} {
 proc readHDL {fname {lib "work"}} {
   set debug 0
   set fType [file extension $fname]
-  if {$fType eq ".v" || $fType eq ".sv"} {
+  if {$fType eq ".v"} {
     if {$debug} {puts "VERILOG ADD $fname $lib"}
     read_verilog -library $lib $fname
+  } elseif {$fType eq ".sv"} {
+    if {$debug} {puts "SYSTEMVERILOG ADD $fname $lib"}
+    read_verilog -sv -library $lib $fname
   } elseif {[string match "*2008/*" $fname]} {
     if {$debug} {puts "VHDL-2008 ADD $fname $lib"}
     read_vhdl -library $lib -vhdl2008 $fname
@@ -672,4 +794,121 @@ proc addHDLdir {dir} {
   
   # non-library hdl default 'work'
   addHDLdirFiles $dir
+}
+
+#--------------------------------------------------------------------------------------------------
+# Parse device.info in main repo for device part and tool version
+# default to u96 and vivado 2023.2 if no file
+#--------------------------------------------------------------------------------------------------
+proc getDeviceInfo {} {
+  upvar partNum partNum
+  upvar vivadoVersion vivadoVersion
+  upvar VivadoPath VivadoPath
+  upvar VivadoSettingsFile VivadoSettingsFile
+
+  set devInfoFile "../device.info"
+  if {![file exist $devInfoFile]} {
+    puts "ERROR: ../device.info does not exist. Default u96, vivado 2023.2"
+    set partNum "xczu3eg-sbva484-1-i" ;# U96v2
+    set vivadoVersion "2023.2"
+    return
+  }
+
+  #--------------------------------
+  set fp [open "../device.info" r]
+  while {[gets $fp line] >= 0} {
+      # Trim and remove comment (everything after '#')
+      set line [string trim $line]
+      if {[string first "#" $line] >= 0} {
+          set line [string trim [string range $line 0 [expr {[string first "#" $line] - 1}]]]
+      }
+      if {$line eq ""} {
+          continue
+      }
+
+      # Extract key and value separated by whitespace
+      if {[regexp {^(\w+)\s+(.+)} $line -> key value]} {
+          if {$key eq "version"} {
+              set vivadoVersion $value
+          } elseif {$key eq "part"} {
+              set partNum $value
+          }
+      }
+  }
+  close $fp
+  #------------------------------
+
+  if {$partNum == "" || $vivadoVersion == ""} {
+    puts "ERROR in device.info : partNum = $partNum, version = $vivadoVersion"
+    exit
+  }
+
+  append VivadoPath "/$vivadoVersion" 
+  set VivadoSettingsFile $VivadoPath/settings64.sh
+  if {![file exist $VivadoPath] || ![file exist $VivadoSettingsFile]} {
+    puts "ERROR - Check Vivado install path.\n\"$VivadoPath\"\n or Vivado Settings File = $VivadoSettingsFile"
+    exit
+  }
+}
+
+#--------------------------------------------------------------------------------------------------
+# Parse .gitmodules in main repo for all submodules
+# version array organization with git hashes and timestamps.
+# instance names:
+# <name>_git_hash_inst
+# <name>_timestamp_inst
+# leave 1st column empty, it gets populated with git hash
+# 2nd column has <name> which will be appended to as above
+# 3rd column is path to repo/submod (from scripts), to get git hash
+#--------------------------------------------------------------------------------------------------
+proc getSubMods {} {
+  
+  upvar versionInfo versionInfo
+  
+  # default values top and bd so the githash module can be in either
+  set versionInfo [list \
+    {"" top   ../   }\
+    {"" bd    ../   } 
+  ]
+
+  set filename "../.gitmodules"
+  set fp [open $filename r]
+  set subModDir ""
+  while {[gets $fp line] >= 0} {
+    set line [string trim $line]
+    if {[string match "path =*" $line]} {
+      set subModDir [string trim [string range $line 6 end]]
+      # Extract final component of the path
+      set name [file tail $subModDir]
+      lappend versionInfo [list "" $name ../$subModDir]
+    }
+  }
+  close $fp
+}
+
+#--------------------------------------------------------------------------------------------------
+# Set some vars based on input args
+#--------------------------------------------------------------------------------------------------
+proc getArgsInfo {} {
+  upvar argv        argv
+  upvar fullProj    fullProj   
+  upvar bdProjOnly  bdProjOnly 
+  upvar simProj     simProj    
+  upvar RMabstract  RMabstract 
+  upvar ipOnly      ipOnly     
+  upvar multipleBDs multipleBDs
+  upvar ipDir       ipDir
+  upvar noIP        noIP
+
+  if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj     TRUE} else {set fullProj    FALSE}
+  if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly   TRUE} else {set bdProjOnly  FALSE}
+  if {("-sim" in $argv)}                          {set simProj      TRUE} else {set simProj     FALSE}
+  if {("-RM" in $argv)}                           {set RMabstract   TRUE} else {set RMabstract  FALSE}
+  if {("-ipOnly" in $argv)}                       {set ipOnly       TRUE} else {set ipOnly      FALSE}
+  if {("-multBD" in $argv)}                       {set multipleBDs  TRUE} else {set multipleBDs FALSE}
+  
+  if {"-noIP" in $argv} {set noIP TRUE} else {set noIP [getIPs]};#returns TRUE if there are no IPs
+  if {"-clean" in $argv} {cleanProc} 
+  if {"-cleanIP" in $argv} {cleanIP}
+
 }

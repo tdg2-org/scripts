@@ -1,55 +1,33 @@
 # See README.md
-#
-# -skipIP -skipBD  
-# -skipRM -skipSYN  -skipIMP 
-# -clean  -noCleanImg -cleanIP
-# -noRM, -noIP
-# -proj
-#
-# Top level build script
-# > tclsh RUN_BUILD.tcl
+# See ../device.info
 
-set VivadoPath "/opt/xilinx/Vivado/2023.2"
+# TODO add this somewhere:   set_param general.maxThreads <value>
 
-set VivadoSettingsFile $VivadoPath/settings64.sh
-if {![file exist $VivadoPath]} {
-  puts "ERROR - Check Vivado install path.\n\"$VivadoPath\" DOES NOT EXIST"
-  exit
-}
-# verify correct dir or quit
+set VivadoPath  "/opt/xilinx/Vivado"  ;# auto-appended with version. see support_procs.tcl getDeviceInfo
+
+# verify script is sourced from correct directory
 set curDir [pwd]
 if {[file tail $curDir] ne "scripts"} {
   puts "Script must be sourced from the 'scripts' directory. You are in $curDir. Exiting." 
   exit
 }
+
 source tcl/support_procs.tcl
+
+getDeviceInfo ;# populates device part and tool version from 'device.info' in primary project repo
 #--------------------------------------------------------------------------------------------------
 # set some vars for use in other sourced scripts
 #--------------------------------------------------------------------------------------------------
 set TOP_ENTITY  "top_io" ;# top entity name or image/bit file generated name...
-set partNum     "xczu3eg-sbva484-1-i" ;# U96v2
-#set partNum     "xczu1cg-sbva484-1-e" ;# ZUBoard
 set hdlDir      "../hdl"
 set simDir      "../hdl/tb"
 set ipDir       "../ip"
 set xdcDir      "../xdc"
 set bdDir       "../bd"
-set extraBDs    ""              ;# additional BDs other than top. auto-populated, don't touch.
-set topBD       [getBDs]        ;# default = "top_bd"
-set topBDtcl    [getBDtclName]  ;# default = "top_bd" for top_bd.tcl
+set topBD       [getBDs]          ;# default = "top_bd"
+set topBDtcl    [getBDtclName]    ;# default = "top_bd" for top_bd.tcl
 set projName    [getProjName]
 set outputDir   [getOutputDir]
-#--------------------------------------------------------------------------------------------------
-# DFX vars. These are auto-populated. DO NOT MODIFY.
-#--------------------------------------------------------------------------------------------------
-set RMs ""      ;# List of all reconfigurable modules, organized per RP
-set RPs ""      ;# List of all reconfigurable partitions.
-set RPlen ""    ;# Number of RPs in design
-set MaxRMs ""   ;# Number of RMs in the RP that has the largest number of RMs.
-set RMfname ""  ;# Single RM only, partial bitstream, using abstract shell. RM filename entered by user.
-set RMmodName "";# Single RM only, partial bitstream, using abstract shell. RM module name for RMfname.
-set RMdir  ""   ;# Single RM only, partial bitstream, using abstract shell. RM directory for RMfname.
-if {!("-noRM" in $argv)} {getDFXconfigs} ;# Proc to populate DFX vars/lists above.
 
 #--------------------------------------------------------------------------------------------------
 # Pre-build stuff
@@ -61,52 +39,17 @@ set buildTimeStamp [getTimeStamp $startTime]
 puts "\n*** BUILD TIMESTAMP: $buildTimeStamp ***\n"
 puts "TCL Version : $tcl_version\n"
 
+# cd out of scripts up one level. assumes scripts is a submod in top level primary repo for design.
+# get the git hash of this primary design repo
 cd ../ 
 set ghash_msb [getGitHash]
 cd $curDir
 
-# instance names:
-# <name>_git_hash_inst
-# <name>_timestamp_inst
-# leave 1st column empty, it gets populated with git hash
-# 2nd column has <name> which will be appended to as above
-# 3rd column is path to repo/submod (from scripts), to get git hash
-set versionInfo [list \
-  {"" top       ../           }\
-  {"" bd        ../           }\
-  {"" led       ./            }\
-  {"" scripts   ./            }
-#  {"" common    ../sub/common }
-]
-updateVersionInfo ;# populate git hashes
-
-if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj TRUE}   else {set fullProj FALSE}
-if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly TRUE} else {set bdProjOnly FALSE}
-if {("-sim" in $argv)}    {set simProj TRUE}    else {set simProj FALSE}
-if {("-RM" in $argv)}     {set RMabstract TRUE} else {set RMabstract FALSE}
-if {("-ipOnly" in $argv)} {set ipOnly TRUE}     else {set ipOnly FALSE}
-
-# if BD project / sim or DFX partial only, skip all this
-if {!$bdProjOnly && !$simProj && !$RMabstract && !$fullProj && !$ipOnly} {
-  if {("-forceCleanImg" in $argv)} {
-    set imageFolder [outputDirGen]
-  } elseif {("-noCleanImg" in $argv) || ("-skipSYN" in $argv) || ("-skipIMP" in $argv) || \
-            ("-skipRM" in $argv) || ("-out" in $argv)} {
-    puts "\n** Skipping clean output_products. **"
-  } else {
-    set imageFolder [outputDirGen]
-  }
-} else {
-  if {$RMabstract} {
-    puts "\n*** DFX Partial only ***"
-  } else {
-    puts "\n*** Generating project only ***"
-  }
-}
-
-if {"-noIP" in $argv} { set noIP TRUE } else {set noIP [getIPs]};#returns TRUE if there are no IPs
-if {"-clean" in $argv} {cleanProc} 
-if {"-cleanIP" in $argv} {cleanIP}
+getDFXconfigs     ;# auto config DFX. don't touch. will return clean if non-DFX
+getSubMods        ;# parse .gitmodules
+updateVersionInfo ;# populate git hashes. exits clean if none instantiated in design
+getArgsInfo       ;# set some vars based on input args
+outputDirGen      ;# generate output products directory
 
 #--------------------------------------------------------------------------------------------------
 # vivado synth/impl commands
@@ -118,20 +61,21 @@ if {!("-skipIP" in $argv) && !$noIP} {
 
 # Generate BD
 if {!("-skipBD" in $argv) && !$simProj && !$RMabstract && !$ipOnly} {
-  vivadoCmd "bd_gen.tcl" $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir
+  vivadoCmd "bd_gen.tcl"  $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir \
+                          $multipleBDs
 }
 
 # Synthesize RMs OOC
 if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
   preSynthRMcheck ;#pre verify RPs/RMs from getDFXconfigs. If this doesn't fail, safe to synth RMs.
   vivadoCmd "syn_rm.tcl"  $hdlDir $partNum \"$RMs\" $outputDir \"$RPs\" $RPlen $RMmodName $RMfname \
-                          $RMdir $buildTimeStamp \"$versionInfo\"
+                          $RMdir $buildTimeStamp \"$versionInfo\" $noIP
 }
 
 # Synthesize full design (static if DFX)
 if {!("-skipSYN" in $argv) && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" \
-                      $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\"
+                      $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\" $multipleBDs
 }
 
 # P&R + bitsream(s)
@@ -149,14 +93,8 @@ if {$simProj} { ;# arg = "-sim"
 # Post-build stuff
 #--------------------------------------------------------------------------------------------------
 
-# check output_products folder at end
-# packageImage
-
+packageImage ;# if -release argv is used, bit/xsa will be tar/zipped
 buildTimeEnd
 endCleanProc
 cleanProc
-
-#close_project -delete
-
-#set_param general.maxThreads <value>
 
