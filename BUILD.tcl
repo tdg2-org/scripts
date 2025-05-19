@@ -56,36 +56,33 @@ outputDirGen      ;# generate output products directory
 #--------------------------------------------------------------------------------------------------
 # Generate non-BD IP
 if {!("-skipIP" in $argv) && !$noIP} {
-  #cd $ipDir
-  #vivadoCmd "$curDir/tcl/gen_ip.tcl" $ipDir $partNum "-proj" "-gen"
   vivadoCmd "gen_ip.tcl" $ipDir $partNum "-proj" "-gen"
-  #cd $curDir
 }
 
 # Generate BD
-if {!("-skipBD" in $argv) && !$simProj && !$RMabstract && !$ipOnly} {
+if {!$skipBD && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "bd_gen.tcl"  $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir \
-                              $multipleBDs
+                          $multipleBDs
 }
 
 # Synthesize RMs OOC
-if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
+if {!$skipRM && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
   preSynthRMcheck ;#pre verify RPs/RMs from getDFXconfigs. If this doesn't fail, safe to synth RMs.
   vivadoCmd "syn_rm.tcl"  $hdlDir $partNum \"$RMs\" $outputDir \"$RPs\" $RPlen $RMmodName $RMfname \
-                              $RMdir $buildTimeStamp \"$versionInfo\" $noIP $ipDir
+                          $RMdir $buildTimeStamp \"$versionInfo\" $noIP $ipDir
 }
 
 # Synthesize full design (static if DFX)
-if {!("-skipSYN" in $argv) && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
+if {!$skipSYN && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" \
-                          $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\" $multipleBDs \
-                          $ipDir
+                      $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\" $multipleBDs \
+                      $ipDir
 }
 
 # P&R + bitsream(s)
-if {!("-skipIMP" in $argv) && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
+if {!$skipIMP && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
   vivadoCmd "imp.tcl" \"$RMs\" $outputDir \"$RPs\" $RPlen $buildTimeStamp $MaxRMs $RMmodName \
-                          $RMfname $RMdir
+                      $RMfname $RMdir
 }
 
 # simulation project

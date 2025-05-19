@@ -902,6 +902,12 @@ proc getArgsInfo {} {
   upvar multipleBDs multipleBDs
   upvar ipDir       ipDir
   upvar noIP        noIP
+  upvar skipIP      skipIP 
+  upvar skipBD      skipBD 
+  upvar skipRM      skipRM 
+  upvar skipSYN     skipSYN
+  upvar skipIMP     skipIMP
+
 
   if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj     TRUE} else {set fullProj    FALSE}
   if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly   TRUE} else {set bdProjOnly  FALSE}
@@ -909,9 +915,31 @@ proc getArgsInfo {} {
   if {("-RM" in $argv)}                           {set RMabstract   TRUE} else {set RMabstract  FALSE}
   if {("-ipOnly" in $argv)}                       {set ipOnly       TRUE} else {set ipOnly      FALSE}
   if {("-multBD" in $argv)}                       {set multipleBDs  TRUE} else {set multipleBDs FALSE}
-  
+  if {"-skipIP"  in $argv}                        {set skipIP       TRUE} else {set skipIP      FALSE}
+  if {"-skipBD"  in $argv}                        {set skipBD       TRUE} else {set skipBD      FALSE}
+  if {"-skipRM"  in $argv}                        {set skipRM       TRUE} else {set skipRM      FALSE}
+  if {"-skipSYN" in $argv}                        {set skipSYN      TRUE} else {set skipSYN     FALSE}
+  if {"-skipIMP" in $argv}                        {set skipIMP      TRUE} else {set skipIMP     FALSE}
+
   if {"-noIP" in $argv} {set noIP TRUE} else {set noIP [getIPs]};#returns TRUE if there are no IPs
   if {"-clean" in $argv} {cleanProc} 
   if {"-cleanIP" in $argv} {cleanIP}
 
+  if {"-gs" in $argv} {
+    exec /bin/bash -c "./sh/check_git_status.sh ../" >@stdout
+    exec /bin/bash -c "./sh/check_git_status.sh ./" >@stdout
+    exec /bin/bash -c "./sh/check_git_status.sh ../sub/" >@stdout
+    exit
+  } 
+
+  if {"-gb" in $argv} {
+    exec /bin/bash -c "./sh/check_git_branches.sh ../" >@stdout
+    exec /bin/bash -c "./sh/check_git_branches.sh ./" >@stdout
+    exec /bin/bash -c "./sh/check_git_branches.sh ../sub/" >@stdout
+    exit
+  } 
+
+
 }
+
+#  if {[catch {exec /bin/bash -c "source $VivadoSettingsFile; $buildCmd" >@stdout} cmdErr]} {

@@ -119,6 +119,10 @@
 
 -release    : "-release <type>". bit/xsa files will be tar/zipped. must be followed by -tar
               or -zip
+
+-gs         : print git status of all repos. no build will run, all other options ignored
+
+-gb         : print git branches of all repos. no build will run, all other options ignored
 ```
 
 ## Examples / Quick copies
