@@ -24,6 +24,7 @@ set RMdir       [lindex $argv 8]
 set timeStamp   [lindex $argv 9]
 set versionInfo [lindex $argv 10]
 set noIP        [lindex $argv 11]
+set ipDir       [lindex $argv 12]
 
 set_part $partNum
 
@@ -41,7 +42,7 @@ addHDLdir ../sub/common/hdl
 # IP must be in ../ip/<ipName>/<ipName>.xci
 # IP already generated in the gen_ip.tcl script
 if {!$noIP} {
-  set ipDir "../ip"
+  #set ipDir "../ip"
   set xciFiles [glob -nocomplain  $ipDir/**/*.xci]
   foreach x $xciFiles {
     set xciRootName [file rootname [file tail $x]]

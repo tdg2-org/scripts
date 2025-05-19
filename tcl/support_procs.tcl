@@ -722,13 +722,16 @@ proc getIPs {} {
 
 #--------------------------------------------------------------------------------------------------
 # delete all generated IP & project
+# updated for ip now being a submodule, don't delete README.md
+# also delete xilinx .Xil generated folder
 #--------------------------------------------------------------------------------------------------
 proc cleanIP {} {
   upvar ipDir ipDir
   set files [glob -nocomplain -tails -directory $ipDir *] 
   foreach x $files {
-    if {$x == "tcl"} {continue} else {file delete -force $ipDir/$x}
+    if {$x == "tcl" || $x == "README.md"} {continue} else {file delete -force $ipDir/$x}
   }
+  if {[file exists $ipDir/.Xil]} {file delete -force $ipDir/.Xil}
 }
 
 #--------------------------------------------------------------------------------------------------

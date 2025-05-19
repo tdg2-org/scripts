@@ -21,6 +21,7 @@ set extraBDs    [lindex $argv 10]
 set timeStamp   [lindex $argv 11]
 set versionInfo [lindex $argv 12]
 set multipleBDs [lindex $argv 13]
+set ipDir       [lindex $argv 14]
 
 set_part $partNum
 
@@ -32,7 +33,7 @@ if {$genProj} {create_project $projName -part $partNum -in_memory} ;# only for f
 # IP must be in ../ip/<ipName>/<ipName>.xci
 # IP already generated in the gen_ip.tcl script
 if {!$noIP} {
-  set ipDir "../ip"
+  #set ipDir "../ip"
   set xciFiles [glob -nocomplain  $ipDir/**/*.xci]
   foreach x $xciFiles {
     set xciRootName [file rootname [file tail $x]]
