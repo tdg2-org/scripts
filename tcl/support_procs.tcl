@@ -92,6 +92,7 @@ proc getBDs {} {
   upvar argc argc
   upvar bdDir bdDir
   upvar extraBDs extraBDs
+  upvar topBDtcl topBDtcl
 
   set extraBDs    ""
   set defaultTopBDName "top_bd"
@@ -113,11 +114,11 @@ proc getBDs {} {
   # strip tcl extension
   set extraBDs [lmap file $extraBDs {file rootname $file}]
   # remove top BD from list
-  set index [lsearch -exact $extraBDs $topBDName]
+  set index [lsearch -exact $extraBDs $topBDtcl]
   if {$index != -1} { 
     set extraBDs [lreplace $extraBDs $index $index]
   } else {
-    puts "ERROR: Top level BD ($topBDName) not found in $bdDir. Quitting."
+    puts "ERROR: Top level BD ($topBDtcl) not found in $bdDir. Quitting."
     exit
   }
   
@@ -340,7 +341,7 @@ proc outputDirGen {} {
 
   # if skipping, get the existing imageFolder name
   if {$skipOutputGen} {
-    foreach item [glob -directory $outputDir -types d *] {
+    foreach item [glob -nocomplain -directory $outputDir -types d *] {
       set folderName [file tail $item]
       if {[regexp {^[A-Fa-f0-9]{8}_[A-Fa-f0-9]{16}$} $folderName]} {
         set imageFolder "$outputDir/$folderName"

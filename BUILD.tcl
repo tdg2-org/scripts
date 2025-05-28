@@ -24,8 +24,8 @@ set simDir      "../hdl/tb"
 set ipDir       "../sub/ip"
 set xdcDir      "../xdc"
 set bdDir       "../bd"
-set topBD       [getBDs]          ;# default = "top_bd"
 set topBDtcl    [getBDtclName]    ;# default = "top_bd" for top_bd.tcl
+set topBD       [getBDs]          ;# default = "top_bd"
 set projName    [getProjName]
 set outputDir   [getOutputDir]
 
