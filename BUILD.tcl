@@ -3,7 +3,8 @@
 
 # TODO add this somewhere:   set_param general.maxThreads <value>
 
-set VivadoPath  "/opt/xilinx/Vivado"  ;# auto-appended with version. see support_procs.tcl getDeviceInfo
+#set VivadoPath  "/opt/xilinx/Vivado"  ;# auto-appended with version. see support_procs.tcl getDeviceInfo
+set VivadoPath  "/opt/xilinx"  ;# auto-appended with version. see support_procs.tcl getDeviceInfo
 
 # verify script is sourced from correct directory
 set curDir [pwd]

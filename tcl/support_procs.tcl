@@ -847,7 +847,14 @@ proc getDeviceInfo {} {
     exit
   }
 
-  append VivadoPath "/$vivadoVersion" 
+  # xilinx changed install path 2025.1, leads with version num
+  if {[expr {$vivadoVersion < 2025}]} {
+    append VivadoPath "/Vivado/$vivadoVersion"
+  } else {
+    append VivadoPath "/$vivadoVersion/Vivado"
+  }
+
+  #append VivadoPath "/$vivadoVersion" 
   set VivadoSettingsFile $VivadoPath/settings64.sh
   if {![file exist $VivadoPath] || ![file exist $VivadoSettingsFile]} {
     puts "ERROR - Check Vivado install path.\n\"$VivadoPath\"\n or Vivado Settings File = $VivadoSettingsFile"
