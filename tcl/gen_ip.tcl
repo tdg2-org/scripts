@@ -1,8 +1,6 @@
 # vivado command script
 # > vivado -mode batch -source gen_ip.tcl -tclargs xczu3eg-sbva484-1-i ../ip -proj
 
-puts "HEREHERE1"
-puts [pwd]
 set curDir [pwd]
 
 set ipDir   [lindex $argv 0]
