@@ -2,11 +2,13 @@
 > tclsh BUILD.tcl <args>
 
 ### easy mode - make
-  - make : generate BD project and run full build  
-  - make project : generate BD project only
-  - make full : generate full project only
-  - make image : run full build, BD project not saved
-  - run all : generate BD project and full project separately, and run full build
+```
+  - make          : generate BD project and run full build  
+  - make project  : generate BD project only
+  - make full     : generate full project only
+  - make image    : run full build, BD project not saved
+  - run all       : generate BD project and full project separately, and run full build
+```
 
 #### Current tool/OS versions:
   - Vivado/Vitis 2025.1
