@@ -215,7 +215,8 @@
   5. Build. First will be static + partials. After this, partials can be built independently.  
 
 #### DFX TODO: 
-- A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
+- A single module cannot be instantiated twice as two reconfigurable modules, due to having  
+  the same name. FIX THIS.
 
 
 # Updates/Changes
