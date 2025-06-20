@@ -212,8 +212,10 @@
   2. Floorplan RMs and save constraints.
   3. Move RMs to RM folders.
   4. Include blackbox module declarations with RM instantiations, for building static.
-  5. Build. First will be static + partials. After this, partials can be built independently.
-**TODO: A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
+  5. Build. First will be static + partials. After this, partials can be built independently.  
+
+#### DFX TODO: 
+- A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
 
 
 # Updates/Changes
