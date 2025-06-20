@@ -154,8 +154,7 @@
 > tclsh BUILD.tcl -clean -name PRJ2 -skipBD -noIP -skipSYN
 
 #### Generate IP and IP project only
-> tclsh BUILD.tcl -clean -skipBD -skipRM -skipSYN -skipIMP
-* this is old, use -ipOnly instead  
+> tclsh BUILD.tcl -ipOnly
 
 #### Build with BD project PRJ0 already generated, clean and regenerate all IP in ip folder
 > tclsh BUILD.tcl -name PRJ0 -skipBD -clean -cleanIP
