@@ -216,7 +216,7 @@
 **TODO: A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
 
 
-#### Updates/Changes
+# Updates/Changes
 - Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
 - Added -ipOnly arg.
 - Added automation for versioning modules (git hash / timestamp).
