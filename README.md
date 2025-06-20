@@ -154,9 +154,6 @@
 #### Build with BD project PRJ2 already generated, skip synth and use previous synth dcp (output_products) to continue with imp.
 > tclsh BUILD.tcl -clean -name PRJ2 -skipBD -noIP -skipSYN
 
-#### Generate IP and IP project only
-> tclsh BUILD.tcl -ipOnly
-
 #### Build with BD project PRJ0 already generated, clean and regenerate all IP in ip folder
 > tclsh BUILD.tcl -name PRJ0 -skipBD -clean -cleanIP
 
