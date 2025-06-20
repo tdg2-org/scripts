@@ -117,7 +117,8 @@
 -verbose    : print script tcl for debug. prevent usage of -notrace for vivado commands.
 
 -out        : "-out <output_products-directory-name>". Custom name of directory location for 
-              image, dcp's, logs, etc. Default is "output_products" if not provided.
+              image, dcp's, logs, etc. Default is "output_products" if not provided.  
+              prepend custom name with "output_products" for git ignore.
 
 -cfg        : "-cfg <cfg-name>". configuration that combines -name, -BDtcl, -out. requires 
               an existing BD tcl script named "top_bd_<cfg-name>". BD project will be 
