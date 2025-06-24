@@ -21,7 +21,6 @@ getDeviceInfo ;# populates device part and tool version from 'device.info' in pr
 #--------------------------------------------------------------------------------------------------
 set TOP_ENTITY  "top_io" ;# top entity name or image/bit file generated name...
 set hdlDir      "../hdl"
-set simDir      "../hdl/tb"
 set ipDir       "../sub/ip"
 set xdcDir      "../xdc"
 set bdDir       "../bd"
@@ -88,7 +87,7 @@ if {!$skipIMP && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
 
 # simulation project
 if {$simProj} { ;# arg = "-sim"
-  vivadoCmd "sim.tcl" $hdlDir $partNum $simDir $projName
+  vivadoCmd "sim.tcl" $hdlDir $partNum $projName \"$versionInfo\"
 }
 
 #--------------------------------------------------------------------------------------------------
