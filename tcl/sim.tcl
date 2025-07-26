@@ -46,6 +46,7 @@ foreach entry $subMods {
     addHDLdir $subDir/hdl/bd 
     addHDLdir $subDir/hdl/mdl 
     addHDLdir $subDir/hdl/tb
+    addHDLdir $subDir/hdl/rx ;# temporary NEED BETTER WAY, do all folders recursively
   }
 }
 
