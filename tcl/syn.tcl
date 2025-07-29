@@ -64,6 +64,10 @@ addHDLdir $hdlDir/common
 addHDLdir ../sub/common/hdl
 addHDLdir ../sub/common/hdl/bd
 
+addHDLdir ../sub/msk_modem/hdl
+addHDLdir ../sub/msk_modem/hdl/rx
+
+
 # constraints
 set filesXDC [glob -nocomplain -tails -directory $xdcDir *.xdc]
 foreach x $filesXDC {
