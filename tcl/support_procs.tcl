@@ -800,6 +800,35 @@ proc addHDLdir {dir} {
   addHDLdirFiles $dir
 }
 
+# separating. this proc will take in path to 'hdl' folder for main repo or subs, parse folders 
+# under 'hdl' and add them all. sim will include 'tb' and 'mdl', which are skipped for synth
+# 'OFF' and 'OLD' folders are skipped for both
+proc addHDL {dir {simVar ""}} {
+  addHDLdir $dir 
+  set dir_list [get_all_dirs $dir]
+  foreach x $dir_list {
+    set xTail [file tail $x]
+    if {$simVar == "SIM"} {
+      addHDLdir $x
+    } elseif {($xTail != "mdl" && $xTail != "tb")} {
+      addHDLdir $x
+    }
+  }
+}
+
+# skip "OFF" and "OLD" dirs
+proc get_all_dirs {base_dir} {
+  set dir_list {}
+  foreach entry [glob -nocomplain -directory $base_dir *] {
+    if {[file isdirectory $entry] && ([file tail $entry] != "OFF") && ([file tail $entry] != "OLD")} {
+      lappend dir_list $entry
+      # Recursively process subdirectories
+      set subdirs [get_all_dirs $entry]
+      foreach sub $subdirs {lappend dir_list $sub}
+    }
+  }
+  return $dir_list
+}
 #--------------------------------------------------------------------------------------------------
 # Parse device.info in main repo for device part and tool version
 # default to u96 and vivado 2023.2 if no file

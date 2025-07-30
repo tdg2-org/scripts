@@ -224,4 +224,5 @@
 - Added -ipOnly arg.
 - Added automation for versioning modules (git hash / timestamp).
 - Added -release arg to zip/tar xsa/bit files.
-
+- 'mdl' and 'tb' folders are for testbenchs and non-synth hdl files only for sim, skipped for synth
+- 'OFF' and 'OLD' folders are skipped completely

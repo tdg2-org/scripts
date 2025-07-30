@@ -34,7 +34,19 @@ set_part $partNum
 
 # add submodule hdl directories here
 #addHDLdir ../sub/crc_gen/hdl
-addHDLdir ../sub/common/hdl
+#addHDLdir ../sub/common/hdl
+
+#--------------------------------------------------------------------------------------------------
+# add submodule hdl, any subs in '../sub' directory
+# must follow format with hdl,mdl,sim dirs
+# skip sw & ip dirs
+#--------------------------------------------------------------------------------------------------
+foreach entry $versionInfo {
+  set subDir [lindex $entry 2]
+  if {[string match "../sub*" $subDir] && $subDir ne "../sub/sw" && $subDir ne "../sub/ip"} {
+    addHDL $subDir/hdl
+  }
+}
 
 #--------------------------------------------------------------------------------------------------
 # read non-BD IP
