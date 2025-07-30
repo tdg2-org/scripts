@@ -44,7 +44,7 @@ set_part $partNum
 foreach entry $versionInfo {
   set subDir [lindex $entry 2]
   if {[string match "../sub*" $subDir] && $subDir ne "../sub/sw" && $subDir ne "../sub/ip"} {
-    addHDL $subDir/hdl
+    addHDLdirRecurs $subDir/hdl
   }
 }
 

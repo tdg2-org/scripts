@@ -221,8 +221,10 @@
 
 # Updates/Changes
 - Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
-- Added -ipOnly arg.
-- Added automation for versioning modules (git hash / timestamp).
-- Added -release arg to zip/tar xsa/bit files.
-- 'mdl' and 'tb' folders are for testbenchs and non-synth hdl files only for sim, skipped for synth
-- 'OFF' and 'OLD' folders are skipped completely
+- Added -ipOnly arg.  
+- Added automation for versioning modules (git hash / timestamp).  
+- Added -release arg to zip/tar xsa/bit files.  
+- Added recursive hdl directory/file add:  
+  * 'mdl' and 'tb' folders are for testbenchs and non-synth hdl files only for sim, skipped for synth  
+  * 'OFF' and 'OLD' folders are skipped completely  
+  * 'addHDLdirRecurs' proc will add recursively, 'addHDLdir' proc adds dir without recursion 

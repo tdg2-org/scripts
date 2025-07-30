@@ -56,7 +56,7 @@ readHDL $hdlDir/top/$topEntity.sv
 
 # add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
 # see tcl/support_procs.tcl 
-addHDL $hdlDir
+addHDLdirRecurs $hdlDir
 # addHDLdir $hdlDir
 # addHDLdir $hdlDir/bd 
 # addHDLdir $hdlDir/common 
@@ -76,7 +76,7 @@ addHDL $hdlDir
 foreach entry $versionInfo {
   set subDir [lindex $entry 2]
   if {[string match "../sub*" $subDir] && $subDir ne "../sub/sw" && $subDir ne "../sub/ip"} {
-    addHDL $subDir/hdl
+    addHDLdirRecurs $subDir/hdl
   }
 }
 

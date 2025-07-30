@@ -28,25 +28,21 @@ foreach x $xciFiles {
 #--------------------------------------------------------------------------------------------------
 # add main repo hdl (not top - not simulating top file or anyting in top folder)
 # adding indiscriminately whether synthesizable or not. this script is meant for sim only
+# * new function adds everything including top... OK
+# for individual directory add (no recursion) use 'addHDLdir' :
+#     addHDLdir $hdlDir
+#     addHDLdir $hdlDir/common
 #--------------------------------------------------------------------------------------------------
-addHDL $hdlDir SIM
-#addHDLdir $hdlDir/bd 
-#addHDLdir $hdlDir/mdl 
-#addHDLdir $hdlDir/tb 
-
+addHDLdirRecurs $hdlDir SIM
 #--------------------------------------------------------------------------------------------------
 # add submodule hdl, any subs in '../sub' directory
 # must follow format with hdl,mdl,sim dirs
-# skip sw & ip dirs
+# skip sw & ip submods
 #--------------------------------------------------------------------------------------------------
 foreach entry $subMods {
   set subDir [lindex $entry 2]
   if {[string match "../sub*" $subDir] && $subDir ne "../sub/sw" && $subDir ne "../sub/ip"} {
-    addHDL $subDir/hdl SIM
-    #addHDLdir $subDir/hdl/bd 
-    #addHDLdir $subDir/hdl/mdl 
-    #addHDLdir $subDir/hdl/tb
-    #addHDLdir $subDir/hdl/rx ;# temporary NEED BETTER WAY, do all folders recursively
+    addHDLdirRecurs $subDir/hdl SIM
   }
 }
 

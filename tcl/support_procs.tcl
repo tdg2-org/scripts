@@ -803,7 +803,7 @@ proc addHDLdir {dir} {
 # separating. this proc will take in path to 'hdl' folder for main repo or subs, parse folders 
 # under 'hdl' and add them all. sim will include 'tb' and 'mdl', which are skipped for synth
 # 'OFF' and 'OLD' folders are skipped for both
-proc addHDL {dir {simVar ""}} {
+proc addHDLdirRecurs {dir {simVar ""}} {
   addHDLdir $dir 
   set dir_list [get_all_dirs $dir]
   foreach x $dir_list {
