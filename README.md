@@ -225,6 +225,7 @@
 - Added automation for versioning modules (git hash / timestamp).  
 - Added -release arg to zip/tar xsa/bit files.  
 - Added recursive hdl directory/file add:  
+  * submods are parsed, 'ip' and 'sw' is skipped
   * 'mdl' and 'tb' folders are for testbenchs and non-synth hdl files only for sim, skipped for synth  
-  * 'OFF' and 'OLD' folders are skipped completely  
+  * 'OFF' and 'OLD' folders are skipped completely, case-sensitive  
   * 'addHDLdirRecurs' proc will add recursively, 'addHDLdir' proc adds dir without recursion 

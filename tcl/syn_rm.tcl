@@ -37,6 +37,7 @@ set_part $partNum
 #addHDLdir ../sub/common/hdl
 
 #--------------------------------------------------------------------------------------------------
+# ** UNTESTED - need to verify
 # add submodule hdl, any subs in '../sub' directory
 # must follow format with hdl,mdl,sim dirs
 # skip sw & ip dirs

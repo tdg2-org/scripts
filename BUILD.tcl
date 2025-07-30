@@ -62,7 +62,7 @@ if {!("-skipIP" in $argv) && !$noIP} {
 # Generate BD
 if {!$skipBD && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "bd_gen.tcl"  $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir \
-                          $multipleBDs
+                          $multipleBDs  \"$versionInfo\"  
 }
 
 # Synthesize RMs OOC
