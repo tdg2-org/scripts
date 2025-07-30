@@ -54,20 +54,12 @@ if {!$noIP} {
 # empty black box.
 readHDL $hdlDir/top/$topEntity.sv 
 
-# add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
-# see tcl/support_procs.tcl 
+#--------------------------------------------------------------------------------------------------
+# for individual directory add (no recursion) use 'addHDLdir' :
+#     addHDLdir $hdlDir
+#     addHDLdir $hdlDir/common
+#--------------------------------------------------------------------------------------------------
 addHDLdirRecurs $hdlDir
-# addHDLdir $hdlDir
-# addHDLdir $hdlDir/bd 
-# addHDLdir $hdlDir/common 
-# 
-# # add submodule hdl directories here
-# addHDLdir ../sub/common/hdl
-# addHDLdir ../sub/common/hdl/bd
-# 
-# addHDLdir ../sub/msk_modem/hdl
-# addHDLdir ../sub/msk_modem/hdl/rx
-
 #--------------------------------------------------------------------------------------------------
 # add submodule hdl, any subs in '../sub' directory
 # must follow format with hdl,mdl,sim dirs
