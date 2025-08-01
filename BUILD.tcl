@@ -76,7 +76,7 @@ if {!$skipRM && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj && !$ip
 if {!$skipSYN && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" \
                       $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\" $multipleBDs \
-                      $ipDir
+                      $ipDir $debug_clk
 }
 
 # P&R + bitsream(s)

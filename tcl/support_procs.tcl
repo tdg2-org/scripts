@@ -931,6 +931,7 @@ proc getSubMods {} {
 #--------------------------------------------------------------------------------------------------
 proc getArgsInfo {} {
   upvar argv        argv
+  upvar argc        argc
   upvar fullProj    fullProj   
   upvar bdProjOnly  bdProjOnly 
   upvar simProj     simProj    
@@ -944,7 +945,7 @@ proc getArgsInfo {} {
   upvar skipRM      skipRM 
   upvar skipSYN     skipSYN
   upvar skipIMP     skipIMP
-
+  upvar debug_clk   debug_clk
 
   if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj     TRUE} else {set fullProj    FALSE}
   if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly   TRUE} else {set bdProjOnly  FALSE}
@@ -976,7 +977,35 @@ proc getArgsInfo {} {
     exit
   } 
 
-
+  set debug_clk [getArgVal "-debug_clk" ""]
 }
+
+#--------------------------------------------------------------------------------------------------
+# Get arg value.
+#  procs: getProjName, getBDtclName, getBDs, getOutputDir 
+#     need to be updated to use this instead
+#--------------------------------------------------------------------------------------------------
+
+proc getArgVal {input_arg default_val} {
+  upvar argv argv
+  upvar argc argc
+  set defaultValue $default_val
+  if {$input_arg in $argv} {
+    set argIdx [lsearch $argv $input_arg]
+    set argIdx [expr $argIdx + 1]
+    if {$argIdx == $argc} {
+      set argVal $defaultValue
+    } else {
+      set argVal [lindex $argv $argIdx]
+      set argVal $argVal
+    }
+  } else {
+    set argVal $defaultValue
+  }
+  return $argVal
+}
+
+
+
 
 #  if {[catch {exec /bin/bash -c "source $VivadoSettingsFile; $buildCmd" >@stdout} cmdErr]} {

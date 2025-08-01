@@ -133,6 +133,11 @@
 -gs         : print git status of all repos. no build will run, all other options ignored
 
 -gb         : print git branches of all repos. no build will run, all other options ignored
+
+-debug_clk  : "-debug_clk <clock_name>". force specific debug hub clock. this is useful if ILAs  
+              are running on slower clocks, and hw manager is having issues connecting. vivado 
+              command: 'connect_debug_port dbg_hub/clk [get_nets $debug_clk]'
+              only usable if there are ILAs in the design
 ```
 
 ## Examples / Quick copies
@@ -229,3 +234,4 @@
   * 'mdl' and 'tb' folders are for testbenchs and non-synth hdl files only for sim, skipped for synth  
   * 'OFF' and 'OLD' folders are skipped completely, case-sensitive  
   * 'addHDLdirRecurs' proc will add recursively, 'addHDLdir' proc adds dir without recursion 
+- Added debug hub clock arg -debug_clk  

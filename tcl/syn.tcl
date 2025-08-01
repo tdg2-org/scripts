@@ -22,6 +22,7 @@ set timeStamp   [lindex $argv 11]
 set versionInfo [lindex $argv 12]
 set multipleBDs [lindex $argv 13]
 set ipDir       [lindex $argv 14]
+set debug_clk   [lindex $argv 15]
 
 set_part $partNum
 
@@ -123,10 +124,26 @@ if {$genProj} {
 #--------------------------------------------------------------------------------------------------
 synth_design -top $topEntity -part $partNum
 
+#--------------------------------------------------------------------------------------------------
+# DEBUG HUB Clock
+#--------------------------------------------------------------------------------------------------
 # For ILAs, force a specific clock on the dbg_hub. this has the dbg_hub in the top file:
 # this is useful if ILAs are running on slower clocks, and hw manager is having issues connecting
-  # connect_debug_port dbg_hub/clk [get_nets clk100]
 
+  #connect_debug_port dbg_hub/clk [get_nets clk100]
+
+# get_debug_cores will return [dbg_hub <ila_inst> ...]
+# get_debug_ports will return [dbg_hub/clk <ila clocks and probes>]
+
+# Use input arg instead: -debug_clk <clock_name>
+if {$debug_clk != ""} {
+  connect_debug_port dbg_hub/clk [get_nets $debug_clk]
+}
+
+
+#--------------------------------------------------------------------------------------------------
+# finalize 
+#--------------------------------------------------------------------------------------------------
 if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
 populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
 write_checkpoint -force $imageDir/dcp/top_synth.dcp
