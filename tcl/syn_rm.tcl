@@ -30,6 +30,7 @@ set_part $partNum
 
 # add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
 # see tcl/support_procs.tcl 
+addHDLdir $hdlDir
 #addHDLdir $hdlDir/common
 
 # add submodule hdl directories here
@@ -38,6 +39,7 @@ set_part $partNum
 
 #--------------------------------------------------------------------------------------------------
 # ** UNTESTED - need to verify
+# $versionInfo contains submodule names, this parses each submod and gets HDL
 # add submodule hdl, any subs in '../sub' directory
 # must follow format with hdl,mdl,sim dirs
 # skip sw & ip dirs

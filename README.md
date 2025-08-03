@@ -34,7 +34,7 @@
 ### Adding submodules
   update bd_gen.tcl, syn.tcl, syn_rm.tcl (if DFX) 
 
-### Versioning
+### Versioning ** DESCRIPTION OUT OF DATE **
   Populating git hashes and timestamps is automated. In BUILD.tcl, variable "versionInfo" is 
   manually updated by user per design with instance \<name> of each git hash and timestamp 
   module (user_init_64b,user_init_32b in the "common" submodule). See BUILD.tcl for example, \<name>
@@ -195,6 +195,9 @@
 
 #### Generate vivado project only for simulation
 > tclsh BUILD.tcl -sim -name PRJ_sim
+
+#### MSK DFX tests
+> cl;tclsh BUILD.tcl -name PRJ1 -skipBD -skipIP -debug_clk clk100  
 
 #### Misc.
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD  
