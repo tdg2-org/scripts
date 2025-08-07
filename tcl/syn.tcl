@@ -60,7 +60,9 @@ readHDL $hdlDir/top/$topEntity.sv
 #     addHDLdir $hdlDir
 #     addHDLdir $hdlDir/common
 #--------------------------------------------------------------------------------------------------
-addHDLdirRecurs $hdlDir
+#addHDLdirRecurs $hdlDir     ;# !!! NO- BAD! problems with DFX, this will add RM* folders - ISSUES WITH DFX
+addHDLdir $hdlDir
+
 #--------------------------------------------------------------------------------------------------
 # add submodule hdl, any subs in '../sub' directory
 # must follow format with hdl,mdl,sim dirs
@@ -144,7 +146,17 @@ if {$debug_clk != ""} {
 #--------------------------------------------------------------------------------------------------
 # finalize 
 #--------------------------------------------------------------------------------------------------
-if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
+#if {!($RPs=="")} {foreach {ignore RP} $RPs {set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]}}
+if {!($RPs=="")} {
+  puts "/n/n **** DFX Synth RPs ****"
+  foreach {ignore RP} $RPs {
+    puts "LOOP ($ignore,$RP) ->  $RP\_inst"
+    set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]
+  }
+}
+
+
+
 populateVersion ;# uses variables timeStamp and versionInfo - support_procs.tcl
 write_checkpoint -force $imageDir/dcp/top_synth.dcp
 
