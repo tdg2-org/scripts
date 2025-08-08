@@ -198,10 +198,13 @@
 
 #### MSK DFX tests
 > cl;tclsh BUILD.tcl -name PRJ1 -skipBD -skipIP -debug_clk clk100  
+> cl;tclsh BUILD.tcl -clean -name PRJ1 -skipIP -skipBD -RM RM0/RM_msk.sv  
+
 
 #### Misc.
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD  
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/led_cnt3_vers.sv  
+
 
 # DFX
 - Nested-DFX not supported.
