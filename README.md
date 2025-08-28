@@ -105,7 +105,7 @@
               name defined within the script.
 
 -BDName     : name of BD within tcl script. "-BDname <bd-name>". Default is "top_bd" if not 
-              provided.
+              provided. ** remember, this will change the name of the generated bd wrapper
 
 -multBD     : this needs to be added if there are multiple BDs in the design. temporary fix
               for using the above -BDtcl,-BDName args, which implies multiple BD tcl files

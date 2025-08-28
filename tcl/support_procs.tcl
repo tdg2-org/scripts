@@ -70,32 +70,45 @@ proc getProjName {} {
 #--------------------------------------------------------------------------------------------------
 # BD tcl script name follows directly after '-BDtcl' input arg
 #--------------------------------------------------------------------------------------------------
+    # proc getBDtclName {} {
+    #   upvar argv argv
+    #   upvar argc argc
+    #   set defaultBDtclName "top_bd"
+    #   if {"-cfg" in $argv} {
+    #     set BDtclNameIdx [lsearch $argv "-cfg"]
+    #     set BDtclNameIdx [expr $BDtclNameIdx + 1]
+    #     if {$BDtclNameIdx == $argc} {
+    #       set BDtclName $defaultBDtclName
+    #     } else {
+    #       set BDtclName [lindex $argv $BDtclNameIdx]
+    #       set BDtclName "top_bd_$BDtclName"
+    #     }
+    #   } elseif {"-BDtcl" in $argv} {
+    #     set BDtclNameIdx [lsearch $argv "-BDtcl"]
+    #     set BDtclNameIdx [expr $BDtclNameIdx + 1]
+    #     if {$BDtclNameIdx == $argc} {
+    #       set BDtclName $defaultBDtclName
+    #     } else {
+    #       set BDtclName [lindex $argv $BDtclNameIdx]
+    #     }
+    #   } else {
+    #     set BDtclName $defaultBDtclName
+    #   }
+    #   return $BDtclName
+    # }
+
 proc getBDtclName {} {
   upvar argv argv
   upvar argc argc
-  set defaultBDtclName "top_bd"
   if {"-cfg" in $argv} {
-    set BDtclNameIdx [lsearch $argv "-cfg"]
-    set BDtclNameIdx [expr $BDtclNameIdx + 1]
-    if {$BDtclNameIdx == $argc} {
-      set BDtclName $defaultBDtclName
-    } else {
-      set BDtclName [lindex $argv $BDtclNameIdx]
-      set BDtclName "top_bd_$BDtclName"
-    }
-  } elseif {"-BDtcl" in $argv} {
-    set BDtclNameIdx [lsearch $argv "-BDtcl"]
-    set BDtclNameIdx [expr $BDtclNameIdx + 1]
-    if {$BDtclNameIdx == $argc} {
-      set BDtclName $defaultBDtclName
-    } else {
-      set BDtclName [lindex $argv $BDtclNameIdx]
-    }
+    set BDtclName [getArgVal "-cfg" "top_bd"]
+    set BDtclName "top_bd_$BDtclName"
   } else {
-    set BDtclName $defaultBDtclName
+    set BDtclName [getArgVal "-BDtcl" "top_bd"]
   }
   return $BDtclName
 }
+
 
 #--------------------------------------------------------------------------------------------------
 # BD name follows directly after '-BDName' input arg
@@ -108,19 +121,19 @@ proc getBDs {} {
   upvar topBDtcl topBDtcl
 
   set extraBDs    ""
-  set defaultTopBDName "top_bd"
+  set topBDName [getArgVal "-BDName" "top_bd"]
 
-  if {"-BDName" in $argv} {
-    set BDNameIdx [lsearch $argv "-BDName"]
-    set BDNameIdx [expr $BDNameIdx + 1]
-    if {$BDNameIdx == $argc} {
-      set topBDName $defaultTopBDName
-    } else {
-      set topBDName [lindex $argv $BDNameIdx]
-    }
-  } else {
-    set topBDName $defaultTopBDName
-  }
+  #  if {"-BDName" in $argv} {
+  #    set BDNameIdx [lsearch $argv "-BDName"]
+  #    set BDNameIdx [expr $BDNameIdx + 1]
+  #    if {$BDNameIdx == $argc} {
+  #      set topBDName $defaultTopBDName
+  #    } else {
+  #      set topBDName [lindex $argv $BDNameIdx]
+  #    }
+  #  } else {
+  #    set topBDName $defaultTopBDName
+  #  }
 
   # get all BD tcl files
   set extraBDs [glob -nocomplain -tails -directory $bdDir *.tcl]
@@ -141,32 +154,45 @@ proc getBDs {} {
 #--------------------------------------------------------------------------------------------------
 # output products/image directory follows after '-out' input arg. default if not provided
 #--------------------------------------------------------------------------------------------------
+    #   proc getOutputDir {} {
+    #     upvar argv argv
+    #     upvar argc argc
+    #     set defaultOutputDir "output_products"
+    #     if {"-cfg" in $argv} {
+    #       set outDirIdx [lsearch $argv "-cfg"]
+    #       set outDirIdx [expr $outDirIdx + 1]
+    #       if {$outDirIdx == $argc} {
+    #         set outDirName $defaultOutputDir
+    #       } else {
+    #         set outDirName [lindex $argv $outDirIdx]
+    #         set outDirName "output_products_$outDirName"
+    #       }
+    #     } elseif {"-out" in $argv} {
+    #       set outDirIdx [lsearch $argv "-out"]
+    #       set outDirIdx [expr $outDirIdx + 1]
+    #       if {$outDirIdx == $argc} {
+    #         set outDirName $defaultOutputDir
+    #       } else {
+    #         set outDirName [lindex $argv $outDirIdx]
+    #       }
+    #     } else {
+    #       set outDirName $defaultOutputDir
+    #     }
+    #     return "../$outDirName"
+    #   }
+
 proc getOutputDir {} {
   upvar argv argv
   upvar argc argc
-  set defaultOutputDir "output_products"
   if {"-cfg" in $argv} {
-    set outDirIdx [lsearch $argv "-cfg"]
-    set outDirIdx [expr $outDirIdx + 1]
-    if {$outDirIdx == $argc} {
-      set outDirName $defaultOutputDir
-    } else {
-      set outDirName [lindex $argv $outDirIdx]
-      set outDirName "output_products_$outDirName"
-    }
-  } elseif {"-out" in $argv} {
-    set outDirIdx [lsearch $argv "-out"]
-    set outDirIdx [expr $outDirIdx + 1]
-    if {$outDirIdx == $argc} {
-      set outDirName $defaultOutputDir
-    } else {
-      set outDirName [lindex $argv $outDirIdx]
-    }
+    set outDirName [getArgVal "-cfg" "output_products"]
+    set outDirName "output_products_$outDirName"
   } else {
-    set outDirName $defaultOutputDir
+    set outDirName [getArgVal "-out" "output_products"]
   }
   return "../$outDirName"
 }
+
 
 #--------------------------------------------------------------------------------------------------
 # End of build print info
@@ -997,8 +1023,7 @@ proc getArgsInfo {} {
 
 #--------------------------------------------------------------------------------------------------
 # Get arg value.
-#  procs: getProjName, getBDtclName, getBDs, getOutputDir 
-#     need to be updated to use this instead
+#  procs: getArgsInfo, getProjName, getBDtclName, getBDs, getOutputDir 
 #--------------------------------------------------------------------------------------------------
 
 proc getArgVal {input_arg default_val} {
