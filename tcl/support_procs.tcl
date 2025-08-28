@@ -92,6 +92,7 @@ proc getBDs {} {
   upvar argc argc
   upvar bdDir bdDir
   upvar extraBDs extraBDs
+  upvar topBDtcl topBDtcl
 
   set extraBDs    ""
   set defaultTopBDName "top_bd"
@@ -113,11 +114,11 @@ proc getBDs {} {
   # strip tcl extension
   set extraBDs [lmap file $extraBDs {file rootname $file}]
   # remove top BD from list
-  set index [lsearch -exact $extraBDs $topBDName]
+  set index [lsearch -exact $extraBDs $topBDtcl]
   if {$index != -1} { 
     set extraBDs [lreplace $extraBDs $index $index]
   } else {
-    puts "ERROR: Top level BD ($topBDName) not found in $bdDir. Quitting."
+    puts "ERROR: Top level BD ($topBDtcl) not found in $bdDir. Quitting."
     exit
   }
   
@@ -340,7 +341,7 @@ proc outputDirGen {} {
 
   # if skipping, get the existing imageFolder name
   if {$skipOutputGen} {
-    foreach item [glob -directory $outputDir -types d *] {
+    foreach item [glob -nocomplain -directory $outputDir -types d *] {
       set folderName [file tail $item]
       if {[regexp {^[A-Fa-f0-9]{8}_[A-Fa-f0-9]{16}$} $folderName]} {
         set imageFolder "$outputDir/$folderName"
@@ -722,13 +723,16 @@ proc getIPs {} {
 
 #--------------------------------------------------------------------------------------------------
 # delete all generated IP & project
+# updated for ip now being a submodule, don't delete README.md
+# also delete xilinx .Xil generated folder
 #--------------------------------------------------------------------------------------------------
 proc cleanIP {} {
   upvar ipDir ipDir
   set files [glob -nocomplain -tails -directory $ipDir *] 
   foreach x $files {
-    if {$x == "tcl"} {continue} else {file delete -force $ipDir/$x}
+    if {$x == "tcl" || $x == "README.md"} {continue} else {file delete -force $ipDir/$x}
   }
+  if {[file exists $ipDir/.Xil]} {file delete -force $ipDir/.Xil}
 }
 
 #--------------------------------------------------------------------------------------------------
@@ -796,6 +800,51 @@ proc addHDLdir {dir} {
   addHDLdirFiles $dir
 }
 
+# separating. this proc will take in path to 'hdl' folder for main repo or subs, parse folders 
+# under 'hdl' and add them all. sim will include 'tb' and 'mdl', which are skipped for synth
+# 'OFF' and 'OLD' folders are skipped for both
+proc addHDLdirRecurs {dir {simVar ""}} {
+  addHDLdir $dir 
+  set dir_list [get_all_dirs $dir]
+  foreach x $dir_list {
+    set xTail [file tail $x]
+    if {$simVar == "SIM"} {
+      addHDLdir $x
+    } elseif {($xTail != "mdl" && $xTail != "tb")} {
+      addHDLdir $x
+    }
+  }
+}
+
+# skip "OFF" and "OLD" dirs, also skip "RM*" for dfx (processed elsewhere)
+
+#proc get_all_dirs {base_dir} {
+#  set dir_list {}
+#  foreach entry [glob -nocomplain -directory $base_dir *] {
+#    if {[file isdirectory $entry] && ([file tail $entry] != "OFF") && ([file tail $entry] != "OLD")} {
+#      lappend dir_list $entry
+#      # Recursively process subdirectories
+#      set subdirs [get_all_dirs $entry]
+#      foreach sub $subdirs {lappend dir_list $sub}
+#    }
+#  }
+#  return $dir_list
+#}
+
+proc get_all_dirs {base_dir} {
+  set dir_list {}
+  foreach entry [glob -nocomplain -types d -directory $base_dir *] {
+    set name [file tail $entry]
+    if {$name ne "OFF" && $name ne "OLD" && ![string match "RM*" $name]} {
+      lappend dir_list $entry
+      # Recursively process subdirectories
+      set subdirs [get_all_dirs $entry]
+      foreach sub $subdirs {lappend dir_list $sub}
+    }
+  }
+  return $dir_list
+}
+
 #--------------------------------------------------------------------------------------------------
 # Parse device.info in main repo for device part and tool version
 # default to u96 and vivado 2023.2 if no file
@@ -843,7 +892,14 @@ proc getDeviceInfo {} {
     exit
   }
 
-  append VivadoPath "/$vivadoVersion" 
+  # xilinx changed install path 2025.1, leads with version num
+  if {[expr {$vivadoVersion < 2025}]} {
+    append VivadoPath "/Vivado/$vivadoVersion"
+  } else {
+    append VivadoPath "/$vivadoVersion/Vivado"
+  }
+
+  #append VivadoPath "/$vivadoVersion" 
   set VivadoSettingsFile $VivadoPath/settings64.sh
   if {![file exist $VivadoPath] || ![file exist $VivadoSettingsFile]} {
     puts "ERROR - Check Vivado install path.\n\"$VivadoPath\"\n or Vivado Settings File = $VivadoSettingsFile"
@@ -891,6 +947,7 @@ proc getSubMods {} {
 #--------------------------------------------------------------------------------------------------
 proc getArgsInfo {} {
   upvar argv        argv
+  upvar argc        argc
   upvar fullProj    fullProj   
   upvar bdProjOnly  bdProjOnly 
   upvar simProj     simProj    
@@ -899,6 +956,12 @@ proc getArgsInfo {} {
   upvar multipleBDs multipleBDs
   upvar ipDir       ipDir
   upvar noIP        noIP
+  upvar skipIP      skipIP 
+  upvar skipBD      skipBD 
+  upvar skipRM      skipRM 
+  upvar skipSYN     skipSYN
+  upvar skipIMP     skipIMP
+  upvar debug_clk   debug_clk
 
   if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj     TRUE} else {set fullProj    FALSE}
   if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly   TRUE} else {set bdProjOnly  FALSE}
@@ -906,9 +969,59 @@ proc getArgsInfo {} {
   if {("-RM" in $argv)}                           {set RMabstract   TRUE} else {set RMabstract  FALSE}
   if {("-ipOnly" in $argv)}                       {set ipOnly       TRUE} else {set ipOnly      FALSE}
   if {("-multBD" in $argv)}                       {set multipleBDs  TRUE} else {set multipleBDs FALSE}
-  
+  if {"-skipIP"  in $argv}                        {set skipIP       TRUE} else {set skipIP      FALSE}
+  if {"-skipBD"  in $argv}                        {set skipBD       TRUE} else {set skipBD      FALSE}
+  if {"-skipRM"  in $argv}                        {set skipRM       TRUE} else {set skipRM      FALSE}
+  if {"-skipSYN" in $argv}                        {set skipSYN      TRUE} else {set skipSYN     FALSE}
+  if {"-skipIMP" in $argv}                        {set skipIMP      TRUE} else {set skipIMP     FALSE}
+
   if {"-noIP" in $argv} {set noIP TRUE} else {set noIP [getIPs]};#returns TRUE if there are no IPs
   if {"-clean" in $argv} {cleanProc} 
   if {"-cleanIP" in $argv} {cleanIP}
 
+  if {"-gs" in $argv} {
+    exec /bin/bash -c "./sh/check_git_status.sh ../" >@stdout
+    exec /bin/bash -c "./sh/check_git_status.sh ./" >@stdout
+    exec /bin/bash -c "./sh/check_git_status.sh ../sub/" >@stdout
+    exit
+  } 
+
+  if {"-gb" in $argv} {
+    exec /bin/bash -c "./sh/check_git_branches.sh ../" >@stdout
+    exec /bin/bash -c "./sh/check_git_branches.sh ./" >@stdout
+    exec /bin/bash -c "./sh/check_git_branches.sh ../sub/" >@stdout
+    exit
+  } 
+
+  set debug_clk [getArgVal "-debug_clk" ""]
 }
+
+#--------------------------------------------------------------------------------------------------
+# Get arg value.
+#  procs: getProjName, getBDtclName, getBDs, getOutputDir 
+#     need to be updated to use this instead
+#--------------------------------------------------------------------------------------------------
+
+proc getArgVal {input_arg default_val} {
+  upvar argv argv
+  upvar argc argc
+  set defaultValue $default_val
+  if {$input_arg in $argv} {
+    set argIdx [lsearch $argv $input_arg]
+    set argIdx [expr $argIdx + 1]
+    if {$argIdx == $argc} {
+      set argVal $defaultValue
+    } else {
+      set argVal [lindex $argv $argIdx]
+      set argVal $argVal
+    }
+  } else {
+    set argVal $defaultValue
+  }
+  return $argVal
+}
+
+
+
+
+#  if {[catch {exec /bin/bash -c "source $VivadoSettingsFile; $buildCmd" >@stdout} cmdErr]} {

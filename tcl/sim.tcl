@@ -3,8 +3,9 @@ source tcl/support_procs.tcl
 
 set hdlDir    [lindex $argv 0]
 set partNum   [lindex $argv 1]
-set simDir    [lindex $argv 2]
-set projName  [lindex $argv 3]
+set projName  [lindex $argv 2]
+set subMods   [lindex $argv 3]
+
 
 create_project $projName -part $partNum -in_memory
 set_property TARGET_LANGUAGE Verilog [current_project]
@@ -12,8 +13,10 @@ set_property TARGET_LANGUAGE Verilog [current_project]
 set_property DEFAULT_LIB work [current_project]
 set_property SOURCE_MGMT_MODE All [current_project]
 
-
-set ipDir "../ip"
+#--------------------------------------------------------------------------------------------------
+# add IP
+#--------------------------------------------------------------------------------------------------
+set ipDir "../sub/ip"
 set xciFiles [glob -nocomplain  $ipDir/**/*.xci]
 foreach x $xciFiles {
   set xciRootName [file rootname [file tail $x]]
@@ -22,13 +25,30 @@ foreach x $xciFiles {
   generate_target all [get_files $ipDir/$xciRootName/$xciRootName.xci] 
 }
 
-addHDLdir $hdlDir
-addHDLdir $hdlDir/bd 
-addHDLdir $hdlDir/common 
-addHDLdir $hdlDir/mdl 
-addHDLdir $simDir
+#--------------------------------------------------------------------------------------------------
+# add main repo hdl (not top - not simulating top file or anyting in top folder)
+# adding indiscriminately whether synthesizable or not. this script is meant for sim only
+# * new function adds everything including top... OK
+# for individual directory add (no recursion) use 'addHDLdir' :
+#     addHDLdir $hdlDir
+#     addHDLdir $hdlDir/common
+#--------------------------------------------------------------------------------------------------
+addHDLdirRecurs $hdlDir SIM
+#--------------------------------------------------------------------------------------------------
+# add submodule hdl, any subs in '../sub' directory
+# must follow format with hdl,mdl,sim dirs
+# skip sw & ip submods
+#--------------------------------------------------------------------------------------------------
+foreach entry $subMods {
+  set subDir [lindex $entry 2]
+  if {[string match "../sub*" $subDir] && $subDir ne "../sub/sw" && $subDir ne "../sub/ip"} {
+    addHDLdirRecurs $subDir/hdl SIM
+  }
+}
 
-
+#--------------------------------------------------------------------------------------------------
+# save proj
+#--------------------------------------------------------------------------------------------------
 set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
 
 #if {!($projName == "DEFAULT_PROJECT")} {save_project_as $projName ../$projName -force}

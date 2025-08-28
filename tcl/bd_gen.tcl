@@ -23,6 +23,7 @@ set topBDtcl    [lindex $argv 5]
 set extraBDs    [lindex $argv 6]
 set ipDir       [lindex $argv 7]
 set multipleBDs [lindex $argv 8]
+set versionInfo [lindex $argv 9]
 
 set_part $partNum ;# might not need this
 create_project $projName -part $partNum -in_memory
@@ -31,6 +32,9 @@ set_property TARGET_LANGUAGE Verilog [current_project]
 set_property DEFAULT_LIB work [current_project]
 set_property SOURCE_MGMT_MODE All [current_project]
 
+#--------------------------------------------------------------------------------------------------
+# add HDL. no recursive add here, add as needed,
+#--------------------------------------------------------------------------------------------------
 # add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
 # see tcl/support_procs.tcl 
 addHDLdir $hdlDir/bd
@@ -40,6 +44,18 @@ addHDLdir $hdlDir/common
 addHDLdir ../sub/common/hdl
 addHDLdir ../sub/common/hdl/bd
 
+#--------------------------------------------------------------------------------------------------
+# ** JUST IN CASE. recursive submod parse/add.  **UNTESTED but should work if needed...
+# add submodule hdl, any subs in '../sub' directory
+# must follow format with hdl,mdl,sim dirs
+# skip sw & ip dirs
+#--------------------------------------------------------------------------------------------------
+# foreach entry $versionInfo {
+#   set subDir [lindex $entry 2]
+#   if {[string match "../sub*" $subDir] && $subDir ne "../sub/sw" && $subDir ne "../sub/ip"} {
+#     addHDLdirRecurs $subDir/hdl
+#   }
+# }
 
 #--------------------------------------------------------------------------------------------------
 # additional BDs 

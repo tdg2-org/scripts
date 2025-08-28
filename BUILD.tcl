@@ -3,7 +3,8 @@
 
 # TODO add this somewhere:   set_param general.maxThreads <value>
 
-set VivadoPath  "/opt/xilinx/Vivado"  ;# auto-appended with version. see support_procs.tcl getDeviceInfo
+#set VivadoPath  "/opt/xilinx/Vivado"  ;# auto-appended with version. see support_procs.tcl getDeviceInfo
+set VivadoPath  "/opt/xilinx"  ;# auto-appended with version. see support_procs.tcl getDeviceInfo
 
 # verify script is sourced from correct directory
 set curDir [pwd]
@@ -20,12 +21,11 @@ getDeviceInfo ;# populates device part and tool version from 'device.info' in pr
 #--------------------------------------------------------------------------------------------------
 set TOP_ENTITY  "top_io" ;# top entity name or image/bit file generated name...
 set hdlDir      "../hdl"
-set simDir      "../hdl/tb"
-set ipDir       "../ip"
+set ipDir       "../sub/ip"
 set xdcDir      "../xdc"
 set bdDir       "../bd"
-set topBD       [getBDs]          ;# default = "top_bd"
 set topBDtcl    [getBDtclName]    ;# default = "top_bd" for top_bd.tcl
+set topBD       [getBDs]          ;# default = "top_bd"
 set projName    [getProjName]
 set outputDir   [getOutputDir]
 
@@ -60,33 +60,34 @@ if {!("-skipIP" in $argv) && !$noIP} {
 }
 
 # Generate BD
-if {!("-skipBD" in $argv) && !$simProj && !$RMabstract && !$ipOnly} {
+if {!$skipBD && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "bd_gen.tcl"  $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir \
-                          $multipleBDs
+                          $multipleBDs  \"$versionInfo\"  
 }
 
 # Synthesize RMs OOC
-if {!("-skipRM" in $argv) && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
+if {!$skipRM && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
   preSynthRMcheck ;#pre verify RPs/RMs from getDFXconfigs. If this doesn't fail, safe to synth RMs.
   vivadoCmd "syn_rm.tcl"  $hdlDir $partNum \"$RMs\" $outputDir \"$RPs\" $RPlen $RMmodName $RMfname \
-                          $RMdir $buildTimeStamp \"$versionInfo\" $noIP
+                          $RMdir $buildTimeStamp \"$versionInfo\" $noIP $ipDir
 }
 
 # Synthesize full design (static if DFX)
-if {!("-skipSYN" in $argv) && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
+if {!$skipSYN && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" \
-                      $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\" $multipleBDs
+                      $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\" $multipleBDs \
+                      $ipDir $debug_clk
 }
 
 # P&R + bitsream(s)
-if {!("-skipIMP" in $argv) && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
+if {!$skipIMP && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
   vivadoCmd "imp.tcl" \"$RMs\" $outputDir \"$RPs\" $RPlen $buildTimeStamp $MaxRMs $RMmodName \
                       $RMfname $RMdir
 }
 
 # simulation project
 if {$simProj} { ;# arg = "-sim"
-  vivadoCmd "sim.tcl" $hdlDir $partNum $simDir $projName
+  vivadoCmd "sim.tcl" $hdlDir $partNum $projName \"$versionInfo\"
 }
 
 #--------------------------------------------------------------------------------------------------

@@ -1,8 +1,17 @@
 ## script to build : BUILD.tcl
 > tclsh BUILD.tcl <args>
 
+### easy mode - make
+```
+  make          : generate BD project and run full build  
+  make project  : generate BD project only
+  make full     : generate full project only
+  make image    : run full build, BD project not saved
+  run all       : generate BD project and full project separately, and run full build
+```
+
 #### Current tool/OS versions:
-  - Vivado/Vitis 2023.2
+  - Vivado/Vitis 2025.1
   - Ubuntu 22.04.5 LTS
 
 ### TODO: 
@@ -25,7 +34,7 @@
 ### Adding submodules
   update bd_gen.tcl, syn.tcl, syn_rm.tcl (if DFX) 
 
-### Versioning
+### Versioning ** DESCRIPTION OUT OF DATE **
   Populating git hashes and timestamps is automated. In BUILD.tcl, variable "versionInfo" is 
   manually updated by user per design with instance \<name> of each git hash and timestamp 
   module (user_init_64b,user_init_32b in the "common" submodule). See BUILD.tcl for example, \<name>
@@ -108,7 +117,8 @@
 -verbose    : print script tcl for debug. prevent usage of -notrace for vivado commands.
 
 -out        : "-out <output_products-directory-name>". Custom name of directory location for 
-              image, dcp's, logs, etc. Default is "output_products" if not provided.
+              image, dcp's, logs, etc. Default is "output_products" if not provided.  
+              prepend custom name with "output_products" for git ignore.
 
 -cfg        : "-cfg <cfg-name>". configuration that combines -name, -BDtcl, -out. requires 
               an existing BD tcl script named "top_bd_<cfg-name>". BD project will be 
@@ -119,6 +129,15 @@
 
 -release    : "-release <type>". bit/xsa files will be tar/zipped. must be followed by -tar
               or -zip
+
+-gs         : print git status of all repos. no build will run, all other options ignored
+
+-gb         : print git branches of all repos. no build will run, all other options ignored
+
+-debug_clk  : "-debug_clk <clock_name>". force specific debug hub clock. this is useful if ILAs  
+              are running on slower clocks, and hw manager is having issues connecting. vivado 
+              command: 'connect_debug_port dbg_hub/clk [get_nets $debug_clk]'
+              only usable if there are ILAs in the design
 ```
 
 ## Examples / Quick copies
@@ -139,9 +158,6 @@
 
 #### Build with BD project PRJ2 already generated, skip synth and use previous synth dcp (output_products) to continue with imp.
 > tclsh BUILD.tcl -clean -name PRJ2 -skipBD -noIP -skipSYN
-
-#### Generate IP and IP project only
-> tclsh BUILD.tcl -clean -skipBD -skipRM -skipSYN -skipIMP
 
 #### Build with BD project PRJ0 already generated, clean and regenerate all IP in ip folder
 > tclsh BUILD.tcl -name PRJ0 -skipBD -clean -cleanIP
@@ -180,13 +196,20 @@
 #### Generate vivado project only for simulation
 > tclsh BUILD.tcl -sim -name PRJ_sim
 
+#### MSK DFX tests
+> cl;tclsh BUILD.tcl -name PRJ1 -skipBD -skipIP -debug_clk clk100  
+> cl;tclsh BUILD.tcl -clean -name PRJ1 -skipIP -skipBD -RM RM0/RM_msk.sv  
+
+
 #### Misc.
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD  
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/led_cnt3_vers.sv  
 
+
 # DFX
 - Nested-DFX not supported.
 - RMs must be in folders named RM* in hdl directory.
+- * Only the top level RM file in the RM* folder. Multiple variations of each allowed with different filenames. All other necessary files placed in hdl folder or submodules as usual.
 - Each RM must have same module/entity name.
 - RM folders are parsed to get module/entity names.
 - RP instance in static region MUST be named "\<RM_module/entity_name>_inst"
@@ -201,13 +224,21 @@
   2. Floorplan RMs and save constraints.
   3. Move RMs to RM folders.
   4. Include blackbox module declarations with RM instantiations, for building static.
-  5. Build. First will be static + partials. After this, partials can be built independently.
-**TODO: A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
+  5. Build. First will be static + partials. After this, partials can be built independently.  
+
+#### DFX TODO: 
+- A single module cannot be instantiated twice as two reconfigurable modules, due to having  
+  the same name. FIX THIS.
 
 
-#### Updates/Changes
+# Updates/Changes
 - Added automation for multiple distinct BDs. Top/primary BD must be default "top_bd" or use -BDtcl. Works with BDCs as well.
-- Added -ipOnly arg.
-- Added automation for versioning modules (git hash / timestamp).
-- Added -release arg to zip/tar xsa/bit files.
-
+- Added -ipOnly arg.  
+- Added automation for versioning modules (git hash / timestamp).  
+- Added -release arg to zip/tar xsa/bit files.  
+- Added recursive hdl directory/file add:  
+  * submods are parsed, 'ip' and 'sw' is skipped
+  * 'mdl' and 'tb' folders are for testbenchs and non-synth hdl files only for sim, skipped for synth  
+  * 'OFF' and 'OLD' folders are skipped completely, case-sensitive  
+  * 'addHDLdirRecurs' proc will add recursively, 'addHDLdir' proc adds dir without recursion 
+- Added debug hub clock arg -debug_clk  

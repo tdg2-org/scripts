@@ -24,16 +24,39 @@ set RMdir       [lindex $argv 8]
 set timeStamp   [lindex $argv 9]
 set versionInfo [lindex $argv 10]
 set noIP        [lindex $argv 11]
+set ipDir       [lindex $argv 12]
 
 set_part $partNum
 
 # add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
 # see tcl/support_procs.tcl 
+# NOTE: could add 'addHDLdirRecurs $hdlDir' to recursively add folders, but maybe not necessary
+#       this is only for DFX, so what does the specific RM need? Could have dependencies that 
+#       could be in the top hdl directory... Submodules are sourced below. For now, limiting to
+#       top hdl directory (non-recursive) and submods (recursive)
+
+#addHDLdirRecurs $hdlDir   ;# recursively add all files and subfolders in hdl directory. skips RM* , OFF, OLD
+
+addHDLdir $hdlDir   ;# not recursive, so only files at the hdl directory
+
 #addHDLdir $hdlDir/common
 
 # add submodule hdl directories here
 #addHDLdir ../sub/crc_gen/hdl
-addHDLdir ../sub/common/hdl
+#addHDLdir ../sub/common/hdl
+
+#--------------------------------------------------------------------------------------------------
+# $versionInfo contains submodule names, this parses each submod and gets HDL
+# add submodule hdl, any subs in '../sub' directory
+# must follow format with hdl,mdl,sim dirs
+# skip sw & ip dirs
+#--------------------------------------------------------------------------------------------------
+foreach entry $versionInfo {
+  set subDir [lindex $entry 2]
+  if {[string match "../sub*" $subDir] && $subDir ne "../sub/sw" && $subDir ne "../sub/ip"} {
+    addHDLdirRecurs $subDir/hdl
+  }
+}
 
 #--------------------------------------------------------------------------------------------------
 # read non-BD IP
@@ -41,7 +64,7 @@ addHDLdir ../sub/common/hdl
 # IP must be in ../ip/<ipName>/<ipName>.xci
 # IP already generated in the gen_ip.tcl script
 if {!$noIP} {
-  set ipDir "../ip"
+  #set ipDir "../ip"
   set xciFiles [glob -nocomplain  $ipDir/**/*.xci]
   foreach x $xciFiles {
     set xciRootName [file rootname [file tail $x]]
