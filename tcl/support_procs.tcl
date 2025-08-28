@@ -816,11 +816,26 @@ proc addHDLdirRecurs {dir {simVar ""}} {
   }
 }
 
-# skip "OFF" and "OLD" dirs
+# skip "OFF" and "OLD" dirs, also skip "RM*" for dfx (processed elsewhere)
+
+#proc get_all_dirs {base_dir} {
+#  set dir_list {}
+#  foreach entry [glob -nocomplain -directory $base_dir *] {
+#    if {[file isdirectory $entry] && ([file tail $entry] != "OFF") && ([file tail $entry] != "OLD")} {
+#      lappend dir_list $entry
+#      # Recursively process subdirectories
+#      set subdirs [get_all_dirs $entry]
+#      foreach sub $subdirs {lappend dir_list $sub}
+#    }
+#  }
+#  return $dir_list
+#}
+
 proc get_all_dirs {base_dir} {
   set dir_list {}
-  foreach entry [glob -nocomplain -directory $base_dir *] {
-    if {[file isdirectory $entry] && ([file tail $entry] != "OFF") && ([file tail $entry] != "OLD")} {
+  foreach entry [glob -nocomplain -types d -directory $base_dir *] {
+    set name [file tail $entry]
+    if {$name ne "OFF" && $name ne "OLD" && ![string match "RM*" $name]} {
       lappend dir_list $entry
       # Recursively process subdirectories
       set subdirs [get_all_dirs $entry]
@@ -829,6 +844,7 @@ proc get_all_dirs {base_dir} {
   }
   return $dir_list
 }
+
 #--------------------------------------------------------------------------------------------------
 # Parse device.info in main repo for device part and tool version
 # default to u96 and vivado 2023.2 if no file

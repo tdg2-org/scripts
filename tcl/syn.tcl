@@ -60,8 +60,7 @@ readHDL $hdlDir/top/$topEntity.sv
 #     addHDLdir $hdlDir
 #     addHDLdir $hdlDir/common
 #--------------------------------------------------------------------------------------------------
-#addHDLdirRecurs $hdlDir     ;# !!! NO- BAD! problems with DFX, this will add RM* folders - ISSUES WITH DFX
-addHDLdir $hdlDir
+addHDLdirRecurs $hdlDir 
 
 #--------------------------------------------------------------------------------------------------
 # add submodule hdl, any subs in '../sub' directory

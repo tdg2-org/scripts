@@ -30,7 +30,15 @@ set_part $partNum
 
 # add HDL directories. adds verilog/systemverilog/vhd/vhd-2008/vhd-2019
 # see tcl/support_procs.tcl 
-addHDLdir $hdlDir
+# NOTE: could add 'addHDLdirRecurs $hdlDir' to recursively add folders, but maybe not necessary
+#       this is only for DFX, so what does the specific RM need? Could have dependencies that 
+#       could be in the top hdl directory... Submodules are sourced below. For now, limiting to
+#       top hdl directory (non-recursive) and submods (recursive)
+
+#addHDLdirRecurs $hdlDir   ;# recursively add all files and subfolders in hdl directory. skips RM* , OFF, OLD
+
+addHDLdir $hdlDir   ;# not recursive, so only files at the hdl directory
+
 #addHDLdir $hdlDir/common
 
 # add submodule hdl directories here
@@ -38,7 +46,6 @@ addHDLdir $hdlDir
 #addHDLdir ../sub/common/hdl
 
 #--------------------------------------------------------------------------------------------------
-# ** UNTESTED - need to verify
 # $versionInfo contains submodule names, this parses each submod and gets HDL
 # add submodule hdl, any subs in '../sub' directory
 # must follow format with hdl,mdl,sim dirs

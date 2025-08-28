@@ -209,6 +209,7 @@
 # DFX
 - Nested-DFX not supported.
 - RMs must be in folders named RM* in hdl directory.
+- * Only the top level RM file in the RM* folder. Multiple variations of each allowed with different filenames. All other necessary files placed in hdl folder or submodules as usual.
 - Each RM must have same module/entity name.
 - RM folders are parsed to get module/entity names.
 - RP instance in static region MUST be named "\<RM_module/entity_name>_inst"
