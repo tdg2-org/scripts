@@ -27,32 +27,45 @@ proc vivadoCmd {fileName args} {
 #--------------------------------------------------------------------------------------------------
 # project name follows directly after '-name' input arg
 #--------------------------------------------------------------------------------------------------
+    #   proc getProjName {} {
+    #     upvar argv argv
+    #     upvar argc argc
+    #     set defaultProjName "DEFAULT_PROJECT"
+    #     if {"-cfg" in $argv} {
+    #       set projNameIdx [lsearch $argv "-cfg"]
+    #       set projNameIdx [expr $projNameIdx + 1]
+    #       if {$projNameIdx == $argc} {
+    #         set projName $defaultProjName
+    #       } else {
+    #         set projName [lindex $argv $projNameIdx]
+    #         set projName "PRJ_$projName"
+    #       }
+    #     } elseif {"-name" in $argv} {
+    #       set projNameIdx [lsearch $argv "-name"]
+    #       set projNameIdx [expr $projNameIdx + 1]
+    #       if {$projNameIdx == $argc} {
+    #         set projName $defaultProjName
+    #       } else {
+    #         set projName [lindex $argv $projNameIdx]
+    #       }
+    #     } else {
+    #       set projName $defaultProjName
+    #     }
+    #     return $projName
+    #   }
+
 proc getProjName {} {
   upvar argv argv
   upvar argc argc
-  set defaultProjName "DEFAULT_PROJECT"
   if {"-cfg" in $argv} {
-    set projNameIdx [lsearch $argv "-cfg"]
-    set projNameIdx [expr $projNameIdx + 1]
-    if {$projNameIdx == $argc} {
-      set projName $defaultProjName
-    } else {
-      set projName [lindex $argv $projNameIdx]
-      set projName "PRJ_$projName"
-    }
-  } elseif {"-name" in $argv} {
-    set projNameIdx [lsearch $argv "-name"]
-    set projNameIdx [expr $projNameIdx + 1]
-    if {$projNameIdx == $argc} {
-      set projName $defaultProjName
-    } else {
-      set projName [lindex $argv $projNameIdx]
-    }
+    set projName [getArgVal "-cfg" "DEFAULT_PROJECT"]
+    set projName "PRJ_$projName"
   } else {
-    set projName $defaultProjName
+    set projName [getArgVal "-name" "DEFAULT_PROJECT"]
   }
   return $projName
 }
+
 
 #--------------------------------------------------------------------------------------------------
 # BD tcl script name follows directly after '-BDtcl' input arg
@@ -817,20 +830,6 @@ proc addHDLdirRecurs {dir {simVar ""}} {
 }
 
 # skip "OFF" and "OLD" dirs, also skip "RM*" for dfx (processed elsewhere)
-
-#proc get_all_dirs {base_dir} {
-#  set dir_list {}
-#  foreach entry [glob -nocomplain -directory $base_dir *] {
-#    if {[file isdirectory $entry] && ([file tail $entry] != "OFF") && ([file tail $entry] != "OLD")} {
-#      lappend dir_list $entry
-#      # Recursively process subdirectories
-#      set subdirs [get_all_dirs $entry]
-#      foreach sub $subdirs {lappend dir_list $sub}
-#    }
-#  }
-#  return $dir_list
-#}
-
 proc get_all_dirs {base_dir} {
   set dir_list {}
   foreach entry [glob -nocomplain -types d -directory $base_dir *] {
