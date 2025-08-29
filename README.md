@@ -89,6 +89,8 @@
               module only. Full build of individual RM up to partial bitstream. Requires 
               initial full build for static region and abstract shell checkpoint.
 
+-RMbin      : will generate bin file in addition to bit file for -RM partial bitstreams only
+
 -proj       : generate BD project only. must be run with -name option.
 
 -full       : generate FULL project with all sources (buildable in GUI). must use with -proj 
@@ -200,10 +202,17 @@
 > cl;tclsh BUILD.tcl -name PRJ1 -skipBD -skipIP -debug_clk clk100  
 > cl;tclsh BUILD.tcl -clean -name PRJ1 -skipIP -skipBD -RM RM0/RM_msk.sv  
 
+#### DFX RM partial - synth will be skipped automatically, no need to provide BD name
+> cl;tclsh BUILD.tcl -clean -skipIP -RM RM0/RM_led_2.sv
 
 #### Misc.
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD  
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/led_cnt3_vers.sv  
+> cl;tclsh BUILD.tcl -clean -name PRJ0 -skipIP -skipBD  
+> cl;tclsh BUILD.tcl -clean -skipIP -RM RM0/RM_led_2.sv -RMbin  
+> cl;tclsh BUILD.tcl -clean -skipIP -RM RM1/RM_led2_2.sv -RMbin  
+> xxd -i RM0_RM_led_2_partial.bin  > RM0_RM_led_2.h
+> xxd -i RM1_RM_led2_2_partial.bin > RM1_RM_led2_2.h
 
 
 # DFX
@@ -242,3 +251,4 @@
   * 'OFF' and 'OLD' folders are skipped completely, case-sensitive  
   * 'addHDLdirRecurs' proc will add recursively, 'addHDLdir' proc adds dir without recursion 
 - Added debug hub clock arg -debug_clk  
+- Added -RMbin arg  

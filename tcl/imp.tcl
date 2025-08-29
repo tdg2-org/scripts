@@ -35,6 +35,7 @@ set MaxRMs      [lindex $argv 5]
 set RMmodName   [lindex $argv 6]
 set RMfname     [lindex $argv 7]
 set RMdir       [lindex $argv 8]
+set RMbin       [lindex $argv 9]
 
 #--------------------------------------------------------------------------------------------------
 # DFX partial only
@@ -46,7 +47,11 @@ if {$RMmodName != ""} {
   open_checkpoint $outputDir/dcp/$RMdir/$RMdir\_AbShell.dcp
   read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir/$RMdir\_post_synth_$RMfnameRoot.dcp
   place_n_route "$RMdir\_$RMmodName\_$RMfnameRoot"
-  write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit
+  if {$RMbin} { 
+    write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit -bin_file
+  } else {
+    write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit
+  }
   write_debug_probes -force $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial_ila_probes.ltx
   return ;# done, return from this script
 }

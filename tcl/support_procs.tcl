@@ -890,19 +890,22 @@ proc getArgsInfo {} {
   upvar skipSYN     skipSYN
   upvar skipIMP     skipIMP
   upvar debug_clk   debug_clk
+  upvar RMbin       RMbin
+
+  if {"-sim"      in $argv}   {set simProj      TRUE} else {set simProj     FALSE}
+  if {"-RM"       in $argv}   {set RMabstract   TRUE} else {set RMabstract  FALSE}
+  if {"-ipOnly"   in $argv}   {set ipOnly       TRUE} else {set ipOnly      FALSE}
+  if {"-multBD"   in $argv}   {set multipleBDs  TRUE} else {set multipleBDs FALSE}
+  if {"-skipIP"   in $argv}   {set skipIP       TRUE} else {set skipIP      FALSE}
+  if {"-skipBD"   in $argv}   {set skipBD       TRUE} else {set skipBD      FALSE}
+  if {"-skipRM"   in $argv}   {set skipRM       TRUE} else {set skipRM      FALSE}
+  if {"-skipSYN"  in $argv}   {set skipSYN      TRUE} else {set skipSYN     FALSE}
+  if {"-skipIMP"  in $argv}   {set skipIMP      TRUE} else {set skipIMP     FALSE}
+  if {"-RMbin"    in $argv}   {set RMbin        TRUE} else {set RMbin       FALSE}
 
   if {("-proj" in $argv) && ("-full" in $argv)}   {set fullProj     TRUE} else {set fullProj    FALSE}
   if {("-proj" in $argv) && !("-full" in $argv)}  {set bdProjOnly   TRUE} else {set bdProjOnly  FALSE}
-  if {("-sim" in $argv)}                          {set simProj      TRUE} else {set simProj     FALSE}
-  if {("-RM" in $argv)}                           {set RMabstract   TRUE} else {set RMabstract  FALSE}
-  if {("-ipOnly" in $argv)}                       {set ipOnly       TRUE} else {set ipOnly      FALSE}
-  if {("-multBD" in $argv)}                       {set multipleBDs  TRUE} else {set multipleBDs FALSE}
-  if {"-skipIP"  in $argv}                        {set skipIP       TRUE} else {set skipIP      FALSE}
-  if {"-skipBD"  in $argv}                        {set skipBD       TRUE} else {set skipBD      FALSE}
-  if {"-skipRM"  in $argv}                        {set skipRM       TRUE} else {set skipRM      FALSE}
-  if {"-skipSYN" in $argv}                        {set skipSYN      TRUE} else {set skipSYN     FALSE}
-  if {"-skipIMP" in $argv}                        {set skipIMP      TRUE} else {set skipIMP     FALSE}
-
+  
   if {"-noIP" in $argv} {set noIP TRUE} else {set noIP [getIPs]};#returns TRUE if there are no IPs
   if {"-clean" in $argv} {cleanProc} 
   if {"-cleanIP" in $argv} {cleanIP}
@@ -922,6 +925,7 @@ proc getArgsInfo {} {
   } 
 
   set debug_clk [getArgVal "-debug_clk" ""]
+
 }
 
 #--------------------------------------------------------------------------------------------------
