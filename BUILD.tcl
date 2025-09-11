@@ -19,7 +19,7 @@ getDeviceInfo ;# populates device part and tool version from 'device.info' in pr
 #--------------------------------------------------------------------------------------------------
 # set some vars for use in other sourced scripts
 #--------------------------------------------------------------------------------------------------
-set TOP_ENTITY  "top_io" ;# top entity name or image/bit file generated name...
+set TOP_ENTITY  [getArgVal "-top_io" "top_io"] ;# top entity name or image/bit file generated name...
 set hdlDir      "../hdl"
 set ipDir       "../sub/ip"
 set xdcDir      "../xdc"

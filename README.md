@@ -99,6 +99,8 @@
               configured in project mode. do NOT use -skipSYN with this option (synthesis will
               not be run, but syn.tcl is where the full project is populated)
 
+-top_io     : name of top level rtl file. default is "top_io" if not provided
+
 -name       : name of BD project to be generated, "-name <project-name>". Independent of BD 
               name and BD tcl script name. prepend names with "PRJ" for git ignore.
 
@@ -237,7 +239,8 @@
 
 #### DFX TODO: 
 - A single module cannot be instantiated twice as two reconfigurable modules, due to having  
-  the same name. FIX THIS.
+  the same name. Leave this as-is:
+  * Use unique RM filenames and instantiate the respective module in each. 
 
 
 # Updates/Changes
@@ -252,3 +255,5 @@
   * 'addHDLdirRecurs' proc will add recursively, 'addHDLdir' proc adds dir without recursion 
 - Added debug hub clock arg -debug_clk  
 - Added -RMbin arg  
+- Added -top_io arg  
+

@@ -924,7 +924,7 @@ proc getArgsInfo {} {
     exit
   } 
 
-  set debug_clk [getArgVal "-debug_clk" ""]
+  set debug_clk   [getArgVal "-debug_clk" ""]
 
 }
 
