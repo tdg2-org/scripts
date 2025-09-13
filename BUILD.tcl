@@ -82,7 +82,7 @@ if {!$skipSYN && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
 # P&R + bitsream(s)
 if {!$skipIMP && !$bdProjOnly && !$simProj && !$fullProj && !$ipOnly} {
   vivadoCmd "imp.tcl" \"$RMs\" $outputDir \"$RPs\" $RPlen $buildTimeStamp $MaxRMs $RMmodName \
-                      $RMfname $RMdir $RMbin
+                      $RMfname $RMdir $RMbin $7series
 }
 
 # simulation project

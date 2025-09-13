@@ -36,6 +36,7 @@ set RMmodName   [lindex $argv 6]
 set RMfname     [lindex $argv 7]
 set RMdir       [lindex $argv 8]
 set RMbin       [lindex $argv 9]
+set 7SERIES     [lindex $argv 10]
 
 #--------------------------------------------------------------------------------------------------
 # DFX partial only
@@ -44,7 +45,12 @@ if {$RMmodName != ""} {
   if {[string match "2008/*" $RMfnameRoot]} {set RMfnameRoot [string trimleft $RMfnameRoot "2008/"]}
   if {[string match "2019/*" $RMfnameRoot]} {set RMfnameRoot [string trimleft $RMfnameRoot "2019/"]}
 
-  open_checkpoint $outputDir/dcp/$RMdir/$RMdir\_AbShell.dcp
+  if {$7SERIES} {
+    open_checkpoint $outputDir/dcp/static_route.dcp
+  } else {
+    open_checkpoint $outputDir/dcp/$RMdir/$RMdir\_AbShell.dcp
+  }
+
   read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir/$RMdir\_post_synth_$RMfnameRoot.dcp
   place_n_route "$RMdir\_$RMmodName\_$RMfnameRoot"
   if {$RMbin} { 
@@ -99,13 +105,15 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
     set_property BITSTREAM.CONFIG.USR_ACCESS $buildTime [current_design]
     write_checkpoint -force $outputDir/dcp/$cfgName.dcp
     
-    #loop through and generate abstract shells for each RP
-    for {set x 1} {$x < [llength $RPs]} {incr x 2} {
-      set curRPinst "[lindex $RPs $x]_inst"
-      set curRPdir [lindex $RPs [expr $x-1]]  
-      write_abstract_shell -cell $curRPinst $outputDir/dcp/$curRPdir/$curRPdir\_AbShell.dcp -force
+    #loop through and generate abstract shells for each RP (ultrascale+ and versal only)
+    if {!$7SERIES} {
+      for {set x 1} {$x < [llength $RPs]} {incr x 2} {
+        set curRPinst "[lindex $RPs $x]_inst"
+        set curRPdir [lindex $RPs [expr $x-1]]  
+        write_abstract_shell -cell $curRPinst $outputDir/dcp/$curRPdir/$curRPdir\_AbShell.dcp -force
+      }
     }
-    
+
     if {![file exists $outputDir/bit]} {file mkdir $outputDir/bit} ;# write_bitstream won't create folder even with -force
     write_bitstream -force -no_partial_bitfile $outputDir/bit/$cfgName.bit
   }

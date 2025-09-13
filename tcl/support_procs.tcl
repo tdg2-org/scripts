@@ -782,6 +782,7 @@ proc getDeviceInfo {} {
   upvar vivadoVersion vivadoVersion
   upvar VivadoPath VivadoPath
   upvar VivadoSettingsFile VivadoSettingsFile
+  upvar 7series 7series
 
   set devInfoFile "../device.info"
   if {![file exist $devInfoFile]} {
@@ -814,10 +815,17 @@ proc getDeviceInfo {} {
   }
   close $fp
   #------------------------------
-
+  
+  # check for 7-series in part number below. necessary for DFX (abstract shell)
+  # would need to do this for ultrascale as well... (if ever applicable)
+  set 7series FALSE 
+  
   if {$partNum == "" || $vivadoVersion == ""} {
     puts "ERROR in device.info : partNum = $partNum, version = $vivadoVersion"
     exit
+  } elseif {[string range $partNum 2 2] == "7"} {
+    set 7series TRUE
+    puts "\r\n****** 7-SERIES DEVICE ******\r\n"
   }
 
   # xilinx changed install path 2025.1, leads with version num
