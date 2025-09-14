@@ -34,7 +34,7 @@
 ### Adding submodules
   update bd_gen.tcl, syn.tcl, syn_rm.tcl (if DFX) 
 
-### Versioning ** DESCRIPTION OUT OF DATE **
+### Versioning ** DESCRIPTION OUT OF DATE, see UPDATE below **
   Populating git hashes and timestamps is automated. In BUILD.tcl, variable "versionInfo" is 
   manually updated by user per design with instance \<name> of each git hash and timestamp 
   module (user_init_64b,user_init_32b in the "common" submodule). See BUILD.tcl for example, \<name>
@@ -51,6 +51,16 @@
   * equal number of git hash and timestamp modules are not required. any number of each is permitted
   * standard zynq+ USR_ACCESS is configured at P&R time with build timestamp, separate/independent 
     from this versioning automation. see imp.tcl for the USR_ACCESS config 
+* Versioning UPDATE (most of above still applies):
+  * versionInfo variable now located in support_procs.tcl. can be modified/appended for 
+    appropriate versioning module name if desired
+  * versionInfo will be appended with submod git hashes. submod versioning modules need to
+    have the correct instance name, and will be populated with git hash and timestamp data
+    - "<submodule name>_git_hash_inst"
+    - "<submodule name>_timestamp_inst"
+    - <submodule name> will be found by parsing .gitmodules, so names must match
+    - These work hierarchically so can be instantiated at any level
+
 
 ### Arguments
 ```
@@ -256,4 +266,5 @@
 - Added debug hub clock arg -debug_clk  
 - Added -RMbin arg  
 - Added -top_io arg  
-
+- DFX improvement: added -hierarchical(internally, not an arg here) so that RMs can be at any 
+  level. up to this point only top level RMs have been tested
