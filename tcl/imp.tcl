@@ -54,17 +54,17 @@ if {$RMmodName != ""} {
       exit ;# exit, not return, so it's obvious
     }
     open_checkpoint $dcpFileName 
-    update_design -cell $RMmodName\_inst -black_box ;#
+    update_design -cell [get_cells -hierarchical $RMmodName\_inst] -black_box ;#
   } else {
     open_checkpoint $outputDir/dcp/$RMdir/$RMdir\_AbShell.dcp
   }
 
-  read_checkpoint -cell $RMmodName\_inst $outputDir/dcp/$RMdir/$RMdir\_post_synth_$RMfnameRoot.dcp
+  read_checkpoint -cell [get_cells -hierarchical $RMmodName\_inst] $outputDir/dcp/$RMdir/$RMdir\_post_synth_$RMfnameRoot.dcp
   place_n_route "$RMdir\_$RMmodName\_$RMfnameRoot"
   if {$RMbin} { 
-    write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit -bin_file
+    write_bitstream -force -cell [get_cells -hierarchical $RMmodName\_inst] $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit -bin_file
   } else {
-    write_bitstream -force -cell $RMmodName\_inst $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit
+    write_bitstream -force -cell [get_cells -hierarchical $RMmodName\_inst] $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial.bit
   }
   write_debug_probes -force $outputDir/bit/$RMdir/$RMdir\_$RMfnameRoot\_partial_ila_probes.ltx
   return ;# done, return from this script
@@ -95,12 +95,12 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
     
     #puts "assembling config RP:$curRPinst in $curRPdir with $RM"
     # check if RP is blackbox. If not, set as blackbox
-    set cellProperty [report_property [get_cells $curRPinst] IS_BLACKBOX -return_string]
+    set cellProperty [report_property [get_cells -hierarchical $curRPinst] IS_BLACKBOX -return_string]
     #if {[lindex $cellProperty 7] == "0"} index 7 of the return string is the boolean 1/0 denoting if blackbox or not
     if {!([lsearch $cellProperty "0"] == "-1")} {
-      update_design   -cell $curRPinst -black_box ;# necessary for subsequent loops after fully populated with RMs in each RP, replacing with new RM must first declare blackbox on the RP
+      update_design   -cell [get_cells -hierarchical $curRPinst] -black_box ;# necessary for subsequent loops after fully populated with RMs in each RP, replacing with new RM must first declare blackbox on the RP
     }
-    read_checkpoint -cell $curRPinst $outputDir/dcp/$curRPdir/$curRPdir\_post_synth_$RM.dcp ;# populate RP with next RM synth dcp
+    read_checkpoint -cell [get_cells -hierarchical $curRPinst] $outputDir/dcp/$curRPdir/$curRPdir\_post_synth_$RM.dcp ;# populate RP with next RM synth dcp
     append cfgName "-" $curRPdir\_$RM
   }
 
@@ -118,7 +118,7 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
       for {set x 1} {$x < [llength $RPs]} {incr x 2} {
         set curRPinst "[lindex $RPs $x]_inst"
         set curRPdir [lindex $RPs [expr $x-1]]  
-        write_abstract_shell -cell $curRPinst $outputDir/dcp/$curRPdir/$curRPdir\_AbShell.dcp -force
+        write_abstract_shell -cell [get_cells -hierarchical $curRPinst] $outputDir/dcp/$curRPdir/$curRPdir\_AbShell.dcp -force
       }
     }
 
@@ -138,7 +138,7 @@ for {set config 0} {$config < $MaxRMs} {incr config} { ;# skipped if no MaxRMs i
       if {[string match "2008/*" $RM]} {set RM [string trimleft $RM "2008/"]} ;# added these for addition of vhdl 2008/2019 automation
       if {[string match "2019/*" $RM]} {set RM [string trimleft $RM "2019/"]}
       if {![file exists $outputDir/bit/$curRPdir]} {file mkdir $outputDir/bit/$curRPdir}
-      write_bitstream -force -cell $curRPinst $outputDir/bit/$curRPdir/$curRPdir\_$RM\_partial.bit
+      write_bitstream -force -cell [get_cells -hierarchical $curRPinst] $outputDir/bit/$curRPdir/$curRPdir\_$RM\_partial.bit
     }
   }
   #puts ""
@@ -155,7 +155,7 @@ if {$DFXrun && $staticDFX} { ;# skip this if empty static not desired for DFX pr
   set idx 0
   foreach RP $RPs {
     if {[expr {$idx % 2}] == 0 } {incr idx;continue} else {
-      update_design -cell "$RP\_inst" -black_box
+      update_design -cell [get_cells -hierarchical $RP\_inst] -black_box
       incr idx
     }
   }

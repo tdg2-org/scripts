@@ -150,7 +150,7 @@ if {!($RPs=="")} {
   puts "/n/n **** DFX Synth RPs ****"
   foreach {ignore RP} $RPs {
     puts "LOOP ($ignore,$RP) ->  $RP\_inst"
-    set_property HD.RECONFIGURABLE true [get_cells $RP\_inst]
+    set_property HD.RECONFIGURABLE true [get_cells -hierarchical $RP\_inst]
   }
 }
 
