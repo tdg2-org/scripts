@@ -46,7 +46,15 @@ if {$RMmodName != ""} {
   if {[string match "2019/*" $RMfnameRoot]} {set RMfnameRoot [string trimleft $RMfnameRoot "2019/"]}
 
   if {$7SERIES} {
-    open_checkpoint $outputDir/dcp/static_route.dcp
+    #open_checkpoint $outputDir/dcp/static_route.dcp
+    #open_checkpoint $outputDir/dcp/CONFIG-ROUTED-RM0_RM_led.dcp ;# ** FILENAME FORCED FOR TESTING ONLY **
+    set dcpFileName [lindex [glob -nocomplain $outputDir/dcp/CONFIG-ROUTED*.dcp] 0] ;# there should never be more than one file of this name, but forcing only one anyway
+    if {$dcpFileName eq ""} {
+      puts "ERROR: CANT FIND STATIC DCP - $outputDir/dcp/CONFIG-ROUTED*.dcp\r\n** EXITING**\r\n"
+      exit ;# exit, not return, so it's obvious
+    }
+    open_checkpoint $dcpFileName 
+    update_design -cell $RMmodName\_inst -black_box ;#
   } else {
     open_checkpoint $outputDir/dcp/$RMdir/$RMdir\_AbShell.dcp
   }
