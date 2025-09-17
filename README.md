@@ -81,6 +81,9 @@
 
 -skipBD     : skip generating BD if already done and no changes made.
 
+-noBD       : non-BD build. required if there is no BD/IPI in the design. RTL flow PL fabric
+              only design
+
 -skipSYN    : skip synthesis of full design (static if DFX proj), generally for debug, or if 
               only need to run implementation with previous synth DCP.
 

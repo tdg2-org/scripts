@@ -60,7 +60,7 @@ if {!("-skipIP" in $argv) && !$noIP} {
 }
 
 # Generate BD
-if {!$skipBD && !$simProj && !$RMabstract && !$ipOnly} {
+if {!$skipBD && !$simProj && !$RMabstract && !$ipOnly && !$noBD} {
   vivadoCmd "bd_gen.tcl"  $hdlDir $partNum $bdDir $projName $topBD $topBDtcl \"$extraBDs\" $ipDir \
                           $multipleBDs  \"$versionInfo\"  
 }
@@ -76,7 +76,7 @@ if {!$skipRM && !($RMs == "") && !$bdProjOnly && !$simProj && !$fullProj && !$ip
 if {!$skipSYN && !$bdProjOnly && !$simProj && !$RMabstract && !$ipOnly} {
   vivadoCmd "syn.tcl" $hdlDir $partNum $topBD $TOP_ENTITY $outputDir $xdcDir $projName \"$RPs\" \
                       $noIP $fullProj \"$extraBDs\" $buildTimeStamp \"$versionInfo\" $multipleBDs \
-                      $ipDir $debug_clk
+                      $ipDir $debug_clk $noBD
 }
 
 # P&R + bitsream(s)

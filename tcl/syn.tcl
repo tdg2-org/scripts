@@ -23,6 +23,7 @@ set versionInfo [lindex $argv 12]
 set multipleBDs [lindex $argv 13]
 set ipDir       [lindex $argv 14]
 set debug_clk   [lindex $argv 15]
+set noBD        [lindex $argv 16]
 
 set_part $partNum
 
@@ -81,38 +82,46 @@ foreach x $filesXDC {
 }
 
 #--------------------------------------------------------------------------------------------------
-# extra BDs
+# BD/IPI. skip if non-BD/IPI design
 #--------------------------------------------------------------------------------------------------
-if {$multipleBDs} {
-  foreach extraBDfile $extraBDs {
-    # in-memory or saved BD project
-    if {$projName == "DEFAULT_PROJECT"} {
-      set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
-      set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
-    } else {
-      set bdFile        "../$projName/$projName.srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
-      set wrapperFile   "../$projName/$projName.gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+if {!$noBD} {
+  #--------------------------------------------------------------------------------------------------
+  # extra supplemental BDs in addition to primary/top below
+  #--------------------------------------------------------------------------------------------------
+  if {$multipleBDs} {
+    foreach extraBDfile $extraBDs {
+      # in-memory or saved BD project
+      if {$projName == "DEFAULT_PROJECT"} {
+        set bdFile        ".srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+        set wrapperFile   ".gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+      } else {
+        set bdFile        "../$projName/$projName.srcs/sources_1/bd/$extraBDfile/$extraBDfile.bd"
+        set wrapperFile   "../$projName/$projName.gen/sources_1/bd/$extraBDfile/hdl/$extraBDfile\_wrapper.v"
+      }
+
+      read_bd $bdFile
+      read_verilog $wrapperFile
     }
-
-    read_bd $bdFile
-    read_verilog $wrapperFile
   }
+  #--------------------------------------------------------------------------------------------------
+  # TOP BD (primary)
+  #--------------------------------------------------------------------------------------------------
+  # in-memory or saved BD project
+  if {$projName == "DEFAULT_PROJECT"} {
+    set bdFile        ".srcs/sources_1/bd/$topBD/$topBD.bd"
+    set wrapperFile   ".gen/sources_1/bd/$topBD/hdl/$topBD\_wrapper.v"
+  } else {
+    set bdFile        "../$projName/$projName.srcs/sources_1/bd/$topBD/$topBD.bd"
+    set wrapperFile   "../$projName/$projName.gen/sources_1/bd/$topBD/hdl/$topBD\_wrapper.v"
+  }
+
+  read_bd $bdFile
+  read_verilog $wrapperFile
+
 }
 #--------------------------------------------------------------------------------------------------
-# TOP BD (primary)
+# Project generation
 #--------------------------------------------------------------------------------------------------
-# in-memory or saved BD project
-if {$projName == "DEFAULT_PROJECT"} {
-  set bdFile        ".srcs/sources_1/bd/$topBD/$topBD.bd"
-  set wrapperFile   ".gen/sources_1/bd/$topBD/hdl/$topBD\_wrapper.v"
-} else {
-  set bdFile        "../$projName/$projName.srcs/sources_1/bd/$topBD/$topBD.bd"
-  set wrapperFile   "../$projName/$projName.gen/sources_1/bd/$topBD/hdl/$topBD\_wrapper.v"
-}
-
-read_bd $bdFile
-read_verilog $wrapperFile
-
 ;# only for full project generation (-proj -full)
 if {$genProj} {
   set_property top $topEntity [current_fileset]

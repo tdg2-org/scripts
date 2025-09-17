@@ -63,8 +63,13 @@ proc getBDs {} {
   upvar bdDir bdDir
   upvar extraBDs extraBDs
   upvar topBDtcl topBDtcl
+  upvar noBD noBD
 
   set extraBDs    ""
+
+  set noBD [expr {"-noBD" in $argv}] ;# returns 1 or 0
+  if {$noBD} {return}  ;# non-BD build. done
+  
   set topBDName [getArgVal "-BDName" "top_bd"]
 
   # get all BD tcl files
