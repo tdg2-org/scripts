@@ -220,6 +220,9 @@
 #### DFX RM partial - synth will be skipped automatically, no need to provide BD name
 > cl;tclsh BUILD.tcl -clean -skipIP -RM RM0/RM_led_2.sv
 
+#### Non-BD/IPI build. artix U+ test
+> cl;tclsh BUILD.tcl -noBD
+
 #### Misc.
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD  
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD -RM RM2/led_cnt3_vers.sv  
@@ -271,3 +274,5 @@
 - Added -top_io arg  
 - DFX improvement: added -hierarchical(internally, not an arg here) so that RMs can be at any 
   level. up to this point only top level RMs have been tested
+- Added check for 7-series devices. no abstract shell DFX. tested/verified DFX still good
+- Added -noBD arg  
