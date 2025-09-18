@@ -276,3 +276,5 @@
   level. up to this point only top level RMs have been tested
 - Added check for 7-series devices. no abstract shell DFX. tested/verified DFX still good
 - Added -noBD arg  
+- Added check for timing failure and notification
+
