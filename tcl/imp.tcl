@@ -187,6 +187,13 @@ write_debug_probes  -force $outputDir/ila_probes
 # what if RPs include AXI I/Fs? difference between static and configs? Shouldn't be...
 write_hw_platform   -fixed -force $outputDir/platform.xsa
 
+# Message at end if timing failed
+if [expr {[get_property SLACK [get_timing_paths -delay_type min_max]] < 0}] {
+  puts "\n\n\n\n*******************************************************************"
+  puts "*******************************************************************\n"
+  puts "!! TIMING FAILURE !! CHECK TIMING REPORTS !!\n"
+  puts "*******************************************************************\n"
+}
 
 #--------------------------------------------------------------------------------------------------
 # If DFX, at least one full configuration, and empty static...
