@@ -2,6 +2,7 @@
 > tclsh BUILD.tcl <args>
 
 ### easy mode - make
+* Needs to be modified for non-BD designs.
 ```
   make          : generate BD project and run full build  
   make project  : generate BD project only
@@ -17,21 +18,22 @@
 ### TODO: 
 - -skipIMP and -skipSYN args will not create the output_products folder, need to check if 
   exists first, create only if NOT exist
-- A single module cannot be instantiated twice as two reconfigurable modules. Fix this.
+- A single module cannot be instantiated twice as two reconfigurable modules. Leave this.  
+  Make RM module names unique, internal modules can be repeated across unique RMs.
 
 ### No spaces allowed in any filenames or folders. Scripts will fail.
 
-### VHDL-2008/2019 now automated. 
+### VHDL-2008/2019 automated. 
   Non-2008/2019 VHDL files can be in the same directories as verilog/systemverilog. Any 
   VHDL-2008/2019 files must be in 2008 or 2019 folders.
 
-### HDL Libraries now automated.
+### HDL Libraries automated.
   Any HDL files required to be compiled/synthesized in custom libraries must be in folders
   named "lib_\<library-name>".
   VHDL-2008/2019 must be in 2008 or 2019 folders under the library folder:
   "hdl/lib_MyLibrary/2008/MyFile.vhd"
 
-### Adding submodules
+### Adding submodules ** out of date, this is automated **
   update bd_gen.tcl, syn.tcl, syn_rm.tcl (if DFX) 
 
 ### Versioning ** DESCRIPTION OUT OF DATE, see UPDATE below **
