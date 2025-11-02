@@ -211,6 +211,8 @@
 
 #### Generate non-BD IP and project only
 > tclsh BUILD.tcl -ipOnly
+##### Non-BD builds (artix)
+> tclsh BUILD.tcl -ipOnly -noBD
 
 #### Generate vivado project only for simulation
 > tclsh BUILD.tcl -sim -name PRJ_sim
@@ -224,6 +226,7 @@
 
 #### Non-BD/IPI build. artix U+ test
 > cl;tclsh BUILD.tcl -noBD
+
 
 #### Misc.
 > cl;tclsh BUILD.tcl -name PRJ1 -skipIP -skipBD  
